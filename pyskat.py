@@ -120,8 +120,11 @@ class Card:
             # beide fehl
             elif (self.suit != trumpf and self.rank != JACK and
                     other.suit != trumpf and other.rank != JACK):
+                # nicht bedient
+                if other.suit != self.suit:
+                    return True
                 # hoeherer fehl
-                if self > other:
+                elif self > other:
                     return True
                 else:
                     return False
@@ -322,28 +325,15 @@ class pyskat:
         # TODO: correct calculation of winner
         #       implementation of 'trumpf'
 
-        # tisch1 kann nicht bedienen und spielt keinen trumpf
-        if (tisch[1].suit != tisch[0].suit and
-                tisch[1].rank != JACK and
-                tisch[1].suit != trumpf):
-            winner = tisch[0].owner
-            
-            if (tisch[2].suit == tisch[0].suit and
-                    tisch[2].rank > tisch[0].rank) or tisch[2].rank == JACK:
-                winner = tisch[2].owner
-        # tisch1 kann bedienen aber liegt drunter
-        elif (tisch[1].suit == tisch[0].suit and
-                tisch[1] < tisch[0]):
-            winner = tisch[0].owner
-
-            if (tisch[2].suit == tisch[0].suit and
-                    tisch[2].rank > tisch[0].rank) or tisch[2].rank == JACK:
+        if tisch[0].isGreater(tisch[1], trumpf):
+            if tisch[0].isGreater(tisch[2], trumpf):
+                winner = tisch[0].owner
+            else:
                 winner = tisch[2].owner
         else:
-            winner = tisch[1].owner
-
-            if (tisch[2].suit == tisch[1].suit and
-                    tisch[2].rank > tisch[1].rank) or tisch[2].rank == JACK:
+            if tisch[1].isGreater(tisch[2], trumpf):
+                winner = tisch[1].owner
+            else:
                 winner = tisch[2].owner
 
         for card in tisch:
