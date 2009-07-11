@@ -193,7 +193,7 @@ class pyskat:
             print "Error: 3 Players required"
 
     def showSkat(self):
-        print "Cards in Skat"
+        print "Cards in Skat:"
         for card in self.skat:
             print card
         print 70 * '-'
@@ -201,6 +201,21 @@ class pyskat:
     def nextRound():
         self.round += 1
         self.giveCards()
+
+    def nextStich():
+        # TODO
+
+    def reizen():
+        # TODO
+
+    def geben():
+        # TODO
+
+    def hoeren():
+        # TODO
+
+    def sagen():
+        # TODO
 
 def main():
 
