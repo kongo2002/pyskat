@@ -154,6 +154,7 @@ class pyskat:
         self.stich = 0
         self.players = []
         self.skat = []
+        self.vorhand = 0
 
     def addPlayer(self, name):
         if len(self.players) < 3:
@@ -198,24 +199,38 @@ class pyskat:
             print card
         print 70 * '-'
 
-    def nextRound():
+    def nextRound(self):
         self.round += 1
+        self.vorhand = (self.vorhand + 1) % 3
         self.giveCards()
 
-    def nextStich():
-        # TODO
+        print "Vorhand: %s" % self.players[self.vorhand]
+        print "Mittelhand: %s" % self.players[(self.vorhand+1)%3]
+        print "Hinterhand: %s" % self.players[(self.vorhand+2)%3]
+        print 70 * '-'
 
-    def reizen():
-        # TODO
+        for i in range(12):
+            self.nextStich()
 
-    def geben():
-        # TODO
+    def nextStich(self):
+        self.stich += 1
+        print "Round %d - Stich %d" % (self.round, self.stich)
 
-    def hoeren():
+    def reizen(self):
         # TODO
+        pass
 
-    def sagen():
+    def geben(self):
         # TODO
+        pass
+
+    def hoeren(self):
+        # TODO
+        pass
+
+    def sagen(self):
+        # TODO
+        pass
 
 def main():
 
@@ -225,9 +240,11 @@ def main():
     skat.addPlayer("Dozo")
 
     skat.listPlayers()
-    skat.giveCards()
+
+    skat.nextRound()
     skat.printPlayerCards()
     skat.showSkat()
+    
 
 if __name__ == '__main__':
     main()
