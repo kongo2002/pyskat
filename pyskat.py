@@ -268,7 +268,7 @@ class pyskat:
     def nextStich(self):
         tisch = []
         self.stich += 1
-        print "Round %d - Stich %d" % (self.round, self.stich)
+        print "*** Round %d - Stich %d ***" % (self.round, self.stich)
         tisch = self.players[self.vorhand].playStich(tisch, None)
         tisch = self.players[(self.vorhand+1)%3].playStich(tisch, None)
         tisch = self.players[(self.vorhand+2)%3].playStich(tisch, None)
