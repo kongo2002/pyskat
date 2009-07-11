@@ -174,8 +174,16 @@ class pyskat:
     def giveCards(self):
         if len(self.players) == 3:
             for player in self.players:
-                for i in range(10):
+                for i in range(3):
                     player.giveCard(self.deck.cards.pop())
+            for player in self.players:
+                for i in range(4):
+                    player.giveCard(self.deck.cards.pop())
+            for player in self.players:
+                for i in range(3):
+                    player.giveCard(self.deck.cards.pop())
+        else:
+            print "Error: 3 Players required"
 
 def main():
 
