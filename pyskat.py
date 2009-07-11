@@ -182,13 +182,38 @@ class Player:
         for card in self.cards:
             print card
 
+    def getMaxReizwert(self):
+        jacks = []
+        reizwert = 0
+
+        for card in self.cards:
+            if card.rank == BUBE:
+                jacks.append(card)
+
+        jacks.sort(reverse=True)
+
+        # ohne 4 - spiel 5
+        if len(jacks) == 0:
+            reizwert = 4
+        # mit ...
+        elif jacks[0].suit == KREUZ:
+            for x in jacks:
+                if x.suit == (KREUZ - 20*reizwert):
+                    reizwert += 1
+                else:
+                    break
+        # ohne ...
+        else:
+            reizwert = (KREUZ - jacks[0].suit) / 20
+
+        return reizwert+1
+
     def playStich(self, tisch, trumpf):
-        print "Tisch: ",
-        print tisch
         print "%s denkt nach..." % self.name
 
         # player = vorhand
         if len(tisch) == 0:
+            # TODO: intelligente kartenauswahl
             # play random card
             i = random.randint(0, len(self.cards)-1)
             print "%s: %s" % (self.name, str(self.cards[i]))
@@ -199,7 +224,7 @@ class Player:
         else:
             possible_cards = []
 
-            # trumpf gespielt?
+            # trumpf gespielt
             if tisch[0].suit == trumpf or tisch[0].rank == BUBE:
                 for j in self.cards:
                     if j.suit == trumpf or j.rank == BUBE:
@@ -215,6 +240,7 @@ class Player:
 
             # stechen/schmieren
             if len(possible_cards) == 0:
+                # TODO: intelligente kartenauswahl
                 # play random card
                 i = random.randint(0, len(self.cards)-1)
                 print "%s: %s" % (self.name, str(self.cards[i]))
@@ -225,6 +251,7 @@ class Player:
                 if len(possible_cards) == 1:
                     i = 0
                 else:
+                    # TODO: intelligente kartenauswahl
                     i = random.randint(0, len(possible_cards)-1)
                 print "%s: %s" % (self.name, str(possible_cards[i]))
                 tisch.append(possible_cards[i])
@@ -234,6 +261,8 @@ class Player:
                     if possible_cards[i] == self.cards[z]:
                         del self.cards[z]
                         break
+
+        print "Tisch: ", tisch
         return tisch
 
 class pyskat:
@@ -296,8 +325,11 @@ class pyskat:
 
         self.printPlayerCards()
         self.showSkat()
+
+        for player in self.players:
+            print player, ": ", player.getMaxReizwert()
     
-        print "Vorhand: %s" % self.players[self.vorhand]
+        print "Vorhand:    %s" % self.players[self.vorhand]
         print "Mittelhand: %s" % self.players[(self.vorhand+1)%3]
         print "Hinterhand: %s" % self.players[(self.vorhand+2)%3]
         print 70 * '-'
