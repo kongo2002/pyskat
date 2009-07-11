@@ -92,16 +92,44 @@ class Card:
     def own(self, player):
         self.owner = player
 
-    def compare(self, other, null=False):
+    def isGreater(self, other, trumpf, null=False):
         if not null:
-            if self > other:
-                print "%s greater than %s" % (str(self), str(other))
-            elif self < other:
-                print "%s less than %s" % (str(self), str(other))
+            # trumpf ueber fehl
+            if ((self.suit == trumpf or self.rank == JACK) and
+                    other.suit != trumpf and
+                    other.rank != JACK):
+                return True
+
+            # beide trumpf
+            elif ((self.suit == trumpf or self.rank == JACK) and
+                    (other.suit == trumpf or other.rank == JACK)):
+                # bube ueber normal
+                if self.rank == JACK and other.rank != JACK:
+                    return True
+                # besserer bube
+                elif ((self.rank == JACK and other.rank == JACK) and
+                        self.suit > other.suit):
+                    return True
+                # besserer trumpf
+                elif ((self.rank != JACK and other.rank != JACK) and
+                        self > other):
+                    return True
+                else:
+                    return False
+
+            # beide fehl
+            elif (self.suit != trumpf and self.rank != JACK and
+                    other.suit != trumpf and other.rank != JACK):
+                # hoeherer fehl
+                if self > other:
+                    return True
+                else:
+                    return False
             else:
-                print "%s equal with %s" % (str(self), str(other))
+                return False
+
         else:
-            # TODO
+            # TODO: nullspiel
             print "not implemented yet"
 
 class Deck:
@@ -274,12 +302,13 @@ class pyskat:
         # TODO: reizen
 
         for i in range(10):
-            self.nextStich()
+            self.nextStich(60)
 
-    def nextStich(self):
+    def nextStich(self, trumpf):
         tisch = []
         self.stich += 1
         print "*** Round %d - Stich %d ***" % (self.round, self.stich)
+        print "*** Spiel: %s ***" % suits[trumpf]
         tisch = self.players[self.vorhand].playStich(tisch, None)
         tisch = self.players[(self.vorhand+1)%3].playStich(tisch, None)
         tisch = self.players[(self.vorhand+2)%3].playStich(tisch, None)
@@ -292,10 +321,21 @@ class pyskat:
 
         # TODO: correct calculation of winner
         #       implementation of 'trumpf'
+
+        # tisch1 kann nicht bedienen und spielt keinen trumpf
         if (tisch[1].suit != tisch[0].suit and
-                tisch[1].rank != JACK):
+                tisch[1].rank != JACK and
+                tisch[1].suit != trumpf):
             winner = tisch[0].owner
             
+            if (tisch[2].suit == tisch[0].suit and
+                    tisch[2].rank > tisch[0].rank) or tisch[2].rank == JACK:
+                winner = tisch[2].owner
+        # tisch1 kann bedienen aber liegt drunter
+        elif (tisch[1].suit == tisch[0].suit and
+                tisch[1] < tisch[0]):
+            winner = tisch[0].owner
+
             if (tisch[2].suit == tisch[0].suit and
                     tisch[2].rank > tisch[0].rank) or tisch[2].rank == JACK:
                 winner = tisch[2].owner
