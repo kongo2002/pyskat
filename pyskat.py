@@ -167,9 +167,18 @@ class Player:
         # bedienen
         else:
             possible_cards = []
-            for j in self.cards:
-                if tisch[0].suit == j.suit:
-                    possible_cards.append(j)
+
+            # trumpf gespielt?
+            if tisch[0].suit == trumpf or tisch[0].rank == JACK:
+                for j in self.cards:
+                    if j.suit == trumpf or j.rank == JACK:
+                        possible_cards.append(j)
+
+            # fehl gespielt
+            else:
+                for j in self.cards:
+                    if tisch[0].suit == j.suit and j.rank != JACK:
+                        possible_cards.append(j)
 
             print possible_cards
 
@@ -261,6 +270,8 @@ class pyskat:
         print "Mittelhand: %s" % self.players[(self.vorhand+1)%3]
         print "Hinterhand: %s" % self.players[(self.vorhand+2)%3]
         print 70 * '-'
+
+        # TODO: reizen
 
         for i in range(10):
             self.nextStich()
