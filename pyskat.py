@@ -151,7 +151,9 @@ class pyskat:
     def __init__(self):
         self.deck = Deck()
         self.round = 0
+        self.stich = 0
         self.players = []
+        self.skat = []
 
     def addPlayer(self, name):
         if len(self.players) < 3:
@@ -173,6 +175,8 @@ class pyskat:
 
     def giveCards(self):
         if len(self.players) == 3:
+            self.deck.shuffle()
+
             for player in self.players:
                 for i in range(3):
                     player.giveCard(self.deck.cards.pop())
@@ -182,8 +186,21 @@ class pyskat:
             for player in self.players:
                 for i in range(3):
                     player.giveCard(self.deck.cards.pop())
+
+            for i in range(2):
+                self.skat.append(self.deck.cards.pop())
         else:
             print "Error: 3 Players required"
+
+    def showSkat(self):
+        print "Cards in Skat"
+        for card in self.skat:
+            print card
+        print 70 * '-'
+
+    def nextRound():
+        self.round += 1
+        self.giveCards()
 
 def main():
 
@@ -195,6 +212,7 @@ def main():
     skat.listPlayers()
     skat.giveCards()
     skat.printPlayerCards()
+    skat.showSkat()
 
 if __name__ == '__main__':
     main()
