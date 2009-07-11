@@ -273,8 +273,32 @@ class pyskat:
         self.vorhand = self.calculatePoints(tisch, None)
 
     def calculatePoints(self, tisch, trumpf):
-        # TODO
-        pass
+        winner = None
+        points = 0
+
+        if (tisch[1].suit != tisch[0].suit and
+                tisch[1].rank != JACK):
+            winner = tisch[0].owner
+            
+            if (tisch[2].suit == tisch[0].suit and
+                    tisch[2].rank > tisch[0].rank) or tisch[2].rank == JACK:
+                winner = tisch[2].owner
+        else:
+            winner = tisch[1].owner
+
+            if (tisch[2].suit == tisch[1].suit and
+                    tisch[2].rank > tisch[1].rank) or tisch[2].rank == JACK:
+                winner = tisch[2].owner
+
+        for card in tisch:
+            points += card.point
+        
+        winner.points += points
+
+        # calculate winner/vorhand index
+        for x in range(len(self.players)):
+            if winner == self.players[x]:
+                return x
 
     def reizen(self):
         # TODO
