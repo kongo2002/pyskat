@@ -141,7 +141,7 @@ class Player:
         return str(self)
 
     def __str__(self):
-        return "%s\t(Points: %d)" % (self.name, self.points)
+        return "%s (Points: %d)" % (self.name, self.points)
 
     def giveCard(self, card):
         card.own(self)
@@ -159,7 +159,7 @@ class Player:
         # player = vorhand
         if len(tisch) == 0:
             # play random card
-            i = random.randint(0, len(self.cards))
+            i = random.randint(0, len(self.cards)-1)
             print "%s: %s" % (self.name, str(self.cards[i]))
             tisch.append(self.cards[i])
             del self.cards[i]
@@ -176,13 +176,16 @@ class Player:
             # stechen/schmieren
             if len(possible_cards) == 0:
                 # play random card
-                i = random.randint(0, len(self.cards))
+                i = random.randint(0, len(self.cards)-1)
                 print "%s: %s" % (self.name, str(self.cards[i]))
                 tisch.append(self.cards[i])
                 del self.cards[i]
             # bedienen
             else:
-                i = random.randint(0, len(possible_cards))
+                if len(possible_cards) == 1:
+                    i = 0
+                else:
+                    i = random.randint(0, len(possible_cards)-1)
                 print "%s: %s" % (self.name, str(possible_cards[i]))
                 tisch.append(possible_cards[i])
 
@@ -259,7 +262,7 @@ class pyskat:
         print "Hinterhand: %s" % self.players[(self.vorhand+2)%3]
         print 70 * '-'
 
-        for i in range(12):
+        for i in range(10):
             self.nextStich()
 
     def nextStich(self):
@@ -276,6 +279,8 @@ class pyskat:
         winner = None
         points = 0
 
+        # TODO: correct calculation of winner
+        #       implementation of 'trumpf'
         if (tisch[1].suit != tisch[0].suit and
                 tisch[1].rank != JACK):
             winner = tisch[0].owner
@@ -294,6 +299,8 @@ class pyskat:
             points += card.point
         
         winner.points += points
+
+        print "%s won that stich" % winner
 
         # calculate winner/vorhand index
         for x in range(len(self.players)):
