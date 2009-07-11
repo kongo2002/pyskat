@@ -137,7 +137,7 @@ class Player:
         return str(self)
 
     def __str__(self):
-        return "Player: %s\t(Points: %d)" % (self.name, self.points)
+        return "%s\t(Points: %d)" % (self.name, self.points)
 
     def giveCard(self, card):
         self.cards.append(card)
@@ -145,6 +145,48 @@ class Player:
     def printCards(self):
         for card in self.cards:
             print card
+
+    def playStich(self, tisch, trumpf):
+        print "Tisch: ",
+        print tisch
+        print "%s thinking..." % self.name
+
+        # player = vorhand
+        if len(tisch) == 0:
+            # play random card
+            i = random.randint(0, len(self.cards))
+            print "%s: %s" % (self.name, str(self.cards[i]))
+            tisch.append(self.cards[i])
+            del self.cards[i]
+
+        # bedienen
+        else:
+            possible_cards = []
+            for j in self.cards:
+                if tisch[0].suit == j.suit:
+                    possible_cards.append(j)
+
+            print possible_cards
+
+            # stechen/schmieren
+            if len(possible_cards) == 0:
+                # play random card
+                i = random.randint(0, len(self.cards))
+                print "%s: %s" % (self.name, str(self.cards[i]))
+                tisch.append(self.cards[i])
+                del self.cards[i]
+            # bedienen
+            else:
+                i = random.randint(0, len(possible_cards))
+                print "%s: %s" % (self.name, str(possible_cards[i]))
+                tisch.append(possible_cards[i])
+
+                # remove played card from cards
+                for z in range(len(self.cards)):
+                    if possible_cards[i] == self.cards[z]:
+                        del self.cards[z]
+                        break
+        return tisch
 
 class pyskat:
 
@@ -204,6 +246,9 @@ class pyskat:
         self.vorhand = (self.vorhand + 1) % 3
         self.giveCards()
 
+        self.printPlayerCards()
+        self.showSkat()
+    
         print "Vorhand: %s" % self.players[self.vorhand]
         print "Mittelhand: %s" % self.players[(self.vorhand+1)%3]
         print "Hinterhand: %s" % self.players[(self.vorhand+2)%3]
@@ -213,8 +258,14 @@ class pyskat:
             self.nextStich()
 
     def nextStich(self):
+        tisch = []
         self.stich += 1
         print "Round %d - Stich %d" % (self.round, self.stich)
+        tisch = self.players[self.vorhand].playStich(tisch, None)
+        tisch = self.players[(self.vorhand+1)%3].playStich(tisch, None)
+        tisch = self.players[(self.vorhand+2)%3].playStich(tisch, None)
+
+        self.vorhand = self.calculatePoints(tisch, None)
 
     def reizen(self):
         # TODO
@@ -242,9 +293,6 @@ def main():
     skat.listPlayers()
 
     skat.nextRound()
-    skat.printPlayerCards()
-    skat.showSkat()
-    
 
 if __name__ == '__main__':
     main()
