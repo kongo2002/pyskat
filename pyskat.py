@@ -5,38 +5,38 @@ import sys
 
 # CONSTANTS
 
-DIAMONDS = 40
-HEARTS = 60
-SPADES = 80
-CLUBS = 100
+KARO = 40
+HERZ = 60
+PIK = 80
+KREUZ = 100
 
-JACK = 11
-QUEEN = 12
-KING = 13
-ACE = 1
+BUBE = 11
+DAME = 12
+KOENIG = 13
+ASS = 1
 
-suits = {   SPADES:     'Spades',
-            CLUBS:      'Clubs',
-            DIAMONDS:   'Diamonds',
-            HEARTS:     'Hearts' }
+suits = {   PIK:    'Pik',
+            KREUZ:  'Kreuz',
+            KARO:   'Karo',
+            HERZ:   'Herz' }
 
-ranks = {   ACE:    'Ace',
-            7:      'Seven',
-            8:      'Eight',
-            9:      'Nine',
-            10:     'Ten',
-            JACK:   'Jack',
-            QUEEN:  'Queen',
-            KING:   'King' }
+ranks = {   ASS:    'Ass',
+            7:      'Sieben',
+            8:      'Acht',
+            9:      'Neun',
+            10:     'Zehn',
+            BUBE:   'Bube',
+            DAME:   'Dame',
+            KOENIG: 'Koenig' }
 
-points = {  ACE:    11,
+points = {  ASS:    11,
             7:      0,
             8:      0,
             9:      0,
             10:     10,
-            JACK:   2,
-            QUEEN:  3,
-            KING:   4 }
+            BUBE:   2,
+            DAME:  3,
+            KOENIG:   4 }
 
 # CLASSES
 
@@ -52,27 +52,27 @@ class Card:
         return str(self)
 
     def __str__(self):
-        return "%s of %s (%d)" % (ranks[self.rank], suits[self.suit], self.point)
+        return "%s %s (%d)" % (suits[self.suit], ranks[self.rank], self.point)
 
     def __cmp__(self, other):
         # jack
-        if self.rank == JACK and other.rank != JACK:
+        if self.rank == BUBE and other.rank != BUBE:
             return 1
-        elif self.rank == JACK and other.rank == JACK:
+        elif self.rank == BUBE and other.rank == BUBE:
             if self.suit > other.suit:
                 return 1
             else:
                 return -1
         # no jack
         else:
-            if other.rank == JACK:
+            if other.rank == BUBE:
                 return -1
             # ace
-            if self.rank == ACE and other.rank != ACE:
+            if self.rank == ASS and other.rank != ASS:
                 return 1
-            elif self.rank == ACE and other.rank == ACE:
+            elif self.rank == ASS and other.rank == ASS:
                 return 0
-            elif other.rank == ACE:
+            elif other.rank == ASS:
                 return -1
             # ten
             elif self.rank == 10 and other.rank != 10:
@@ -95,31 +95,31 @@ class Card:
     def isGreater(self, other, trumpf, null=False):
         if not null:
             # trumpf ueber fehl
-            if ((self.suit == trumpf or self.rank == JACK) and
+            if ((self.suit == trumpf or self.rank == BUBE) and
                     other.suit != trumpf and
-                    other.rank != JACK):
+                    other.rank != BUBE):
                 return True
 
             # beide trumpf
-            elif ((self.suit == trumpf or self.rank == JACK) and
-                    (other.suit == trumpf or other.rank == JACK)):
+            elif ((self.suit == trumpf or self.rank == BUBE) and
+                    (other.suit == trumpf or other.rank == BUBE)):
                 # bube ueber normal
-                if self.rank == JACK and other.rank != JACK:
+                if self.rank == BUBE and other.rank != BUBE:
                     return True
                 # besserer bube
-                elif ((self.rank == JACK and other.rank == JACK) and
+                elif ((self.rank == BUBE and other.rank == BUBE) and
                         self.suit > other.suit):
                     return True
                 # besserer trumpf
-                elif ((self.rank != JACK and other.rank != JACK) and
+                elif ((self.rank != BUBE and other.rank != BUBE) and
                         self > other):
                     return True
                 else:
                     return False
 
             # beide fehl
-            elif (self.suit != trumpf and self.rank != JACK and
-                    other.suit != trumpf and other.rank != JACK):
+            elif (self.suit != trumpf and self.rank != BUBE and
+                    other.suit != trumpf and other.rank != BUBE):
                 # nicht bedient
                 if other.suit != self.suit:
                     return True
@@ -156,7 +156,7 @@ class Deck:
         return s
 
     def shuffle(self):
-        print "--> shuffling card deck"
+        print "--> mische Karten"
         for i in range(random.randint(2, 5)):
             random.shuffle(self.cards)
 
@@ -172,7 +172,7 @@ class Player:
         return str(self)
 
     def __str__(self):
-        return "%s (Points: %d)" % (self.name, self.points)
+        return "%s (Punkte: %d)" % (self.name, self.points)
 
     def giveCard(self, card):
         card.own(self)
@@ -185,7 +185,7 @@ class Player:
     def playStich(self, tisch, trumpf):
         print "Tisch: ",
         print tisch
-        print "%s thinking..." % self.name
+        print "%s denkt nach..." % self.name
 
         # player = vorhand
         if len(tisch) == 0:
@@ -200,15 +200,15 @@ class Player:
             possible_cards = []
 
             # trumpf gespielt?
-            if tisch[0].suit == trumpf or tisch[0].rank == JACK:
+            if tisch[0].suit == trumpf or tisch[0].rank == BUBE:
                 for j in self.cards:
-                    if j.suit == trumpf or j.rank == JACK:
+                    if j.suit == trumpf or j.rank == BUBE:
                         possible_cards.append(j)
 
             # fehl gespielt
             else:
                 for j in self.cards:
-                    if tisch[0].suit == j.suit and j.rank != JACK:
+                    if tisch[0].suit == j.suit and j.rank != BUBE:
                         possible_cards.append(j)
 
             print possible_cards
@@ -250,7 +250,7 @@ class pyskat:
         if len(self.players) < 3:
             self.players.append(Player(name))
         else:
-            print "Error: max. 3 Players"
+            print "Error: max. 3 Spieler"
 
     def listPlayers(self):
         print 70 * '-'
@@ -281,10 +281,10 @@ class pyskat:
             for i in range(2):
                 self.skat.append(self.deck.cards.pop())
         else:
-            print "Error: 3 Players required"
+            print "Error: 3 Spieler noetig"
 
     def showSkat(self):
-        print "Cards in Skat:"
+        print "Karten im Skat:"
         for card in self.skat:
             print card
         print 70 * '-'
@@ -310,7 +310,7 @@ class pyskat:
     def nextStich(self, trumpf):
         tisch = []
         self.stich += 1
-        print "*** Round %d - Stich %d ***" % (self.round, self.stich)
+        print "*** Runde %d - Stich %d ***" % (self.round, self.stich)
         print "*** Spiel: %s ***" % suits[trumpf]
         tisch = self.players[self.vorhand].playStich(tisch, None)
         tisch = self.players[(self.vorhand+1)%3].playStich(tisch, None)
@@ -341,7 +341,7 @@ class pyskat:
         
         winner.points += points
 
-        print "%s won that stich" % winner
+        print "%s bekommt den Stich" % winner
 
         # calculate winner/vorhand index
         for x in range(len(self.players)):
