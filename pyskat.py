@@ -46,6 +46,7 @@ class Card:
         self.suit = id - id % 20
         self.rank = id % 20
         self.point = points[self.rank]
+        self.owner = None
 
     def __repr__(self):
         return str(self)
@@ -87,6 +88,9 @@ class Card:
                 return 0
             else:
                 return -1
+
+    def own(self, player):
+        self.owner = player
 
     def compare(self, other, null=False):
         if not null:
@@ -140,6 +144,7 @@ class Player:
         return "%s\t(Points: %d)" % (self.name, self.points)
 
     def giveCard(self, card):
+        card.own(self)
         self.cards.append(card)
 
     def printCards(self):
@@ -266,6 +271,10 @@ class pyskat:
         tisch = self.players[(self.vorhand+2)%3].playStich(tisch, None)
 
         self.vorhand = self.calculatePoints(tisch, None)
+
+    def calculatePoints(self, tisch, trumpf):
+        # TODO
+        pass
 
     def reizen(self):
         # TODO
