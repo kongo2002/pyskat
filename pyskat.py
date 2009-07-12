@@ -174,12 +174,14 @@ class Deck:
 
 class Player:
 
-    def __init__(self, name):
+    def __init__(self, name, pos):
         self.name = name
+        self.position = pos
         self.gesamt = 0
         self.points = 0
         self.cards = []
         self.gereizt = 0
+        self.re = False
 
     def __repr__(self):
         return str(self)
@@ -350,7 +352,7 @@ class Player:
             return True
 
     def spielAnsagen(self):
-        # TODO: handspiel und grandspiel
+        # TODO: nullspiel und grandspiel
         #       KI
         return self.getBestSuit()
 
@@ -425,7 +427,7 @@ class pyskat:
 
     def addPlayer(self, name):
         if len(self.players) < 3:
-            self.players.append(Player(name))
+            self.players.append(Player(name, len(self.players)))
         else:
             print "Error: max. 3 Spieler"
 
@@ -494,6 +496,7 @@ class pyskat:
                     gewinner.gereizt)
 
             handspiel = gewinner.takeSkat(self.skat)
+            gewinner.re = True
 
         self.trumpf = gewinner.spielAnsagen()
 
@@ -562,15 +565,7 @@ class pyskat:
             if card.owner == player:
                 player.cards.append(card)
 
-        # schwarz
-        if re_pts == 120:
-            spielwert = reizen[self.trumpf] * (player.getMaxReizwert()+2)
-        # schneider
-        elif re_pts > 90:
-            spielwert = reizen[self.trumpf] * (player.getMaxReizwert()+1)
-        # normal
-        else:
-            spielwert = reizen[self.trumpf] * player.getMaxReizwert()
+        spielwert = reizen[self.trumpf] * player.getMaxReizwert()
 
         kontra_pts = 120 - re_pts
 
@@ -585,6 +580,14 @@ class pyskat:
                 print "%s gewinnt mit %d zu %d Punkten" % (player.name,
                         re_pts,
                         kontra_pts)
+
+                # schwarz gewonnen
+                if re_pts == 120:
+                    spielwert += reizen[self.trumpf]*2
+                # schneider gewonnen
+                elif re_pts > 90:
+                    spielwert += reizen[self.trumpf]
+
                 player.gesamt += spielwert
                 print "%s: + %d Punkte" % (player.name, spielwert)
             # spiel verloren
@@ -609,8 +612,11 @@ class pyskat:
             print "%s: - %d Punkte" % (player.name, spielwert)
 
         # karten des gewinners zurueck ins deck
-
         del player.cards[:]
+
+        for spieler in self.players:
+            spieler.re = False
+            spieler.gereizt = 0
 
         self.listPlayers()
 
