@@ -277,16 +277,17 @@ class Player:
 
     def takeSkat(self, skat):
         for i in range(len(skat)):
+            skat[i].own(self)
             self.cards.append(skat[i])
-            del skat[i]
 
+        del skat[0]; del skat[0]
         # TODO: KI
         classes = []
         for suit in [40,60,80,100]:
             suited = []
             for card in self.cards:
-            if card.suit == suit and card.rank != BUBE:
-                suited.append(card)
+                if card.suit == suit and card.rank != BUBE:
+                    suited.append(card)
             classes.append(suited)
 
         while len(skat) < 2:
@@ -299,12 +300,30 @@ class Player:
             # nur zwei fehl, skat noch leer
             if len(skat) == 0:
                 for farbe in classes:
-                    if len(farbe) == 2 and farbe[0] != ASS and farbe[1] != ASS:
+                    if len(farbe) == 2 and farbe[0].rank != ASS and farbe[1].rank != ASS:
                         skat.append(farbe[0])
                         skat.append(farbe[1])
                         del farbe[0]
-                        del farbe[1]
+                        del farbe[0]
                         break
+            # rest auswaehlen
+            for i in range(2-len(skat)):
+                j = 0
+                for k in range(len(classes)):
+                    if len(classes[k]) > 0:
+                        if (len(classes[k]) < len(classes[j]) or
+                                len(classes[j]) == 0):
+                            j = k
+                classes[j].sort()
+                skat.append(classes[j][0])
+                del classes[j][0]
+
+        # ausgewaehlte karten entfernen
+        for card in skat:
+            for z in range(len(self.cards)):
+                if card == self.cards[z]:
+                    del self.cards[z]
+                    break
 
         if len(skat) == 2:
             return False
@@ -448,10 +467,13 @@ class pyskat:
             # TODO: alle passen -> ramsch
             pass
         else:
-            handspiel = gewinner.takeSkat()
+            print "%s gewinnt das Reizen mit %d Punkten" % (gewinner.name,
+                    gewinner.gereizt)
 
-        print "%s gewinnt das Reizen mit %d Punkten" % (gewinner.name,
-                gewinner.gereizt)
+            handspiel = gewinner.takeSkat(self.skat)
+
+        self.showSkat()
+        self.printPlayerCards()
 
         for i in range(10):
             self.nextStich(60)
