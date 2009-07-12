@@ -176,6 +176,7 @@ class Player:
 
     def __init__(self, name):
         self.name = name
+        self.gesamt = 0
         self.points = 0
         self.cards = []
         self.gereizt = 0
@@ -184,7 +185,7 @@ class Player:
         return str(self)
 
     def __str__(self):
-        return "%s (Punkte: %d)" % (self.name, self.points)
+        return "%s (Punkte: %d)" % (self.name, self.gesamt)
 
     def giveCard(self, card):
         card.own(self)
@@ -346,6 +347,10 @@ class Player:
             # TODO: handspiel
             return True
 
+    def spielAnsagen(self):
+        # TODO: handspiel und grandspiel
+        #       KI
+        return self.getBestSuit()
 
     def playStich(self, tisch, trumpf):
         print "%s denkt nach..." % self.name
@@ -414,6 +419,7 @@ class pyskat:
         self.skat = []
         self.vorhand = 0
         self.handspiel = False
+        self.trumpf = 0
 
     def addPlayer(self, name):
         if len(self.players) < 3:
@@ -487,11 +493,15 @@ class pyskat:
 
             handspiel = gewinner.takeSkat(self.skat)
 
+        self.trumpf = gewinner.spielAnsagen()
+
         self.showSkat()
         self.printPlayerCards()
 
         for i in range(10):
-            self.nextStich(60)
+            self.nextStich(self.trumpf)
+
+        self.roundSummary(gewinner)
 
     def nextStich(self, trumpf):
         tisch = []
@@ -527,28 +537,63 @@ class pyskat:
         
         winner.points += points
 
-        print "%s bekommt den Stich" % winner
+        print "%s bekommt den Stich (%d)" % (winner, points)
+
+        # karten zurueck ins deck
+        self.deck.cards.extend(tisch)
 
         # calculate winner/vorhand index
         for x in range(len(self.players)):
             if winner == self.players[x]:
                 return x
 
-    def reizen(self):
-        # TODO
-        pass
+    def roundSummary(self, player):
+        re_pts = player.points
+        for card in self.skat:
+            re_pts += card.point
 
-    def geben(self):
-        # TODO
-        pass
+        # karten temporaer zurueckholen
+        for card in self.deck.cards:
+            if card.owner == player:
+                player.cards.append(card)
 
-    def hoeren(self):
-        # TODO
-        pass
+        # schwarz
+        if re_pts == 120:
+            spielwert = reizen[self.trumpf] * (player.getMaxReizwert()+2)
+        # schneider
+        elif re_pts > 90:
+            spielwert = reizen[self.trumpf] * (player.getMaxReizwert()+1)
+        # normal
+        else:
+            spielwert = reizen[self.trumpf] * player.getMaxReizwert()
 
-    def sagen(self):
-        # TODO
-        pass
+        kontra_pts = 120 - re_pts
+
+        print 70 * '-'
+        print "Runde %d - Spiel: %s" % (self.round, suits[self.trumpf])
+        print "%s gereizt bis %d" % (player.name, player.gereizt)
+
+        # nicht ueberreizt
+        if player.gereizt <= spielwert:
+            # spiel gewonnen
+            if re_pts > 60:
+                print "%s gewinnt mit %d zu %d Punkten" % (player.name,
+                        re_pts,
+                        kontra_pts)
+                player.gesamt += spielwert
+            # spiel verloren
+            else:
+                print "%s verliert mit %d zu %d Punkten" % (player.name,
+                        re_pts,
+                        kontra_pts)
+                player.gesamt -= spielwert
+        # ueberreizt
+        else:
+            print "Spiel (%d) ueberreizt - verloren!" % spielwert
+            player.gesamt -= spielwert
+
+        # karten des gewinners zurueck ins deck
+        del player.cards[:]
 
 def main():
 
