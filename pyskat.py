@@ -261,6 +261,14 @@ class Player:
                 else:
                     return hoerer
 
+    def doHoeren(self, ansage):
+        if ansage <= self.reizen():
+            print "%s sagt JA" % self.name
+            return True
+        else:
+            print "%s sagt PASSE" % self.name
+            return False
+
     def playStich(self, tisch, trumpf):
         print "%s denkt nach..." % self.name
 
