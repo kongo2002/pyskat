@@ -356,32 +356,31 @@ class Player:
         #       KI
         return self.getBestSuit()
 
-    def playStich(self, tisch, trumpf):
+    def playStich(self, tisch):
         print "%s denkt nach..." % self.name
 
         # player = vorhand
-        if len(tisch) == 0:
+        if len(tisch.stich) == 0:
             # TODO: intelligente kartenauswahl
             # play random card
             i = random.randint(0, len(self.cards)-1)
             print "%s: %s" % (self.name, str(self.cards[i]))
-            tisch.append(self.cards[i])
-            del self.cards[i]
+            return self.cards[i]
 
         # bedienen
         else:
             possible_cards = []
 
             # trumpf gespielt
-            if tisch[0].suit == trumpf or tisch[0].rank == BUBE:
+            if tisch.stich[0].suit == tisch.trumpf or tisch.stich[0].rank == BUBE:
                 for j in self.cards:
-                    if j.suit == trumpf or j.rank == BUBE:
+                    if j.suit == tisch.trumpf or j.rank == BUBE:
                         possible_cards.append(j)
 
             # fehl gespielt
             else:
                 for j in self.cards:
-                    if tisch[0].suit == j.suit and j.rank != BUBE:
+                    if tisch.stich[0].suit == j.suit and j.rank != BUBE:
                         possible_cards.append(j)
 
             print possible_cards
@@ -392,8 +391,7 @@ class Player:
                 # play random card
                 i = random.randint(0, len(self.cards)-1)
                 print "%s: %s" % (self.name, str(self.cards[i]))
-                tisch.append(self.cards[i])
-                del self.cards[i]
+                return self.cards[i]
             # bedienen
             else:
                 if len(possible_cards) == 1:
@@ -402,142 +400,102 @@ class Player:
                     # TODO: intelligente kartenauswahl
                     i = random.randint(0, len(possible_cards)-1)
                 print "%s: %s" % (self.name, str(possible_cards[i]))
-                tisch.append(possible_cards[i])
-
-                # remove played card from cards
-                for z in range(len(self.cards)):
-                    if possible_cards[i] == self.cards[z]:
-                        del self.cards[z]
-                        break
+                return possible_cards[i]
 
         print "Tisch: ", tisch
         return tisch
 
-class pyskat:
-
+class Tisch:
+    
     def __init__(self):
-        self.deck = Deck()
-        self.round = 0
-        self.stich = 0
         self.players = []
+        self.playedStiche = []
+        self.stich = []
         self.skat = []
+        self.trumpf = 0
         self.vorhand = 0
         self.handspiel = False
-        self.trumpf = 0
+        self.spielmacher = None
 
-    def addPlayer(self, name):
-        if len(self.players) < 3:
-            self.players.append(Player(name, len(self.players)))
-        else:
-            print "Error: max. 3 Spieler"
+    def playCard(self, card):
+        self.stich.append(card)
 
-    def listPlayers(self):
-        print 70 * '-'
-        for player in self.players:
-            print player
-        print 70 * '-'
+        # remove played card from player
+        for i in range(len(self.players)):
+            for j in range(len(self.players[i].cards)):
+                if self.players[i].cards[j] == card:
+                    del self.players[i].cards[j]
+                    break
 
-    def printPlayerCards(self):
-        for player in self.players:
-            print player
-            player.printCards()
-            print 70 * '-'
+        if len(self.stich) == 3:
+            lastStich = self.stich[:]
+            self.playedStiche.append(lastStich)
+            del self.stich[:]
 
-    def giveCards(self, vorhand):
+    def giveCards(self, cards):
         if len(self.players) == 3:
-            self.deck.shuffle()
-
             for z in range(3):
                 for i in range(3):
-                    self.players[(z+vorhand)%3].giveCard(self.deck.cards.pop())
+                    self.players[(z+self.vorhand)%3].giveCard(cards.pop())
             for z in range(3):
                 for i in range(4):
-                    self.players[(z+vorhand)%3].giveCard(self.deck.cards.pop())
+                    self.players[(z+self.vorhand)%3].giveCard(cards.pop())
             for z in range(3):
                 for i in range(3):
-                    self.players[(z+vorhand)%3].giveCard(self.deck.cards.pop())
+                    self.players[(z+self.vorhand)%3].giveCard(cards.pop())
 
             for i in range(2):
-                self.skat.append(self.deck.cards.pop())
+                self.skat.append(cards.pop())
         else:
             print "Error: 3 Spieler noetig"
 
-    def showSkat(self):
-        print "Karten im Skat:"
-        for card in self.skat:
-            print card
-        print 70 * '-'
+    def reizen(self, vorhand):
+        self.spielmacher = self.players[(vorhand+1)%3].doSagen(self.players[vorhand])
+        self.spielmacher = self.spielmacher.doSagen(self.players[(vorhand+2)%3])
 
-    def nextRound(self):
-        self.round += 1
-        self.vorhand = (self.vorhand + 1) % 3
-        self.giveCards(self.vorhand)
-
-        self.printPlayerCards()
-        self.showSkat()
-
-        for player in self.players:
-            player.reizen()
-    
-        print "Vorhand:    %s" % self.players[self.vorhand]
-        print "Mittelhand: %s" % self.players[(self.vorhand+1)%3]
-        print "Hinterhand: %s" % self.players[(self.vorhand+2)%3]
-        print 70 * '-'
-
-        # reizen
-        gewinner = self.players[(self.vorhand+1)%3].doSagen(self.players[self.vorhand])
-        gewinner = gewinner.doSagen(self.players[(self.vorhand+2)%3])
-
-        if gewinner.gereizt == 0:
+        if self.spielmacher.gereizt == 0:
             # TODO: alle passen -> ramsch
             pass
         else:
-            print "%s gewinnt das Reizen mit %d Punkten" % (gewinner.name,
-                    gewinner.gereizt)
+            print "%s gewinnt das Reizen mit %d Punkten" % (self.spielmacher.name,
+                    self.spielmacher.gereizt)
 
-            handspiel = gewinner.takeSkat(self.skat)
-            gewinner.re = True
+            self.handspiel = self.spielmacher.takeSkat(self.skat)
+            self.spielmacher.re = True
 
-        self.trumpf = gewinner.spielAnsagen()
+        self.trumpf = self.spielmacher.spielAnsagen()
 
-        self.showSkat()
-        self.printPlayerCards()
+    def nextStich(self):
+        print "*** Stich %d ***" % (len(self.playedStiche)+1)
+        print "*** Spiel: %s ***" % suits[self.trumpf]
 
-        for i in range(10):
-            self.nextStich(self.trumpf)
+        self.playCard(self.players[self.vorhand].playStich(self))
+        self.playCard(self.players[(self.vorhand+1)%3].playStich(self))
+        self.playCard(self.players[(self.vorhand+2)%3].playStich(self))
 
-        self.roundSummary(gewinner)
+        self.vorhand = self.calculatePoints()
 
-    def nextStich(self, trumpf):
-        tisch = []
-        self.stich += 1
-        print "*** Runde %d - Stich %d ***" % (self.round, self.stich)
-        print "*** Spiel: %s ***" % suits[trumpf]
-        tisch = self.players[self.vorhand].playStich(tisch, None)
-        tisch = self.players[(self.vorhand+1)%3].playStich(tisch, None)
-        tisch = self.players[(self.vorhand+2)%3].playStich(tisch, None)
-
-        self.vorhand = self.calculatePoints(tisch, None)
-
-    def calculatePoints(self, tisch, trumpf):
+    def calculatePoints(self):
         winner = None
         points = 0
+
+        lastStich = self.playedStiche[len(self.playedStiche)-1]
 
         # TODO: correct calculation of winner
         #       implementation of 'trumpf'
 
-        if tisch[0].isGreater(tisch[1], trumpf):
-            if tisch[0].isGreater(tisch[2], trumpf):
-                winner = tisch[0].owner
+        if lastStich[0].isGreater(lastStich[1], self.trumpf):
+            if lastStich[0].isGreater(lastStich[2], self.trumpf):
+                winner = lastStich[0].owner
             else:
-                winner = tisch[2].owner
+                winner = lastStich[2].owner
         else:
-            if tisch[1].isGreater(tisch[2], trumpf):
-                winner = tisch[1].owner
+            if lastStich[1].isGreater(lastStich[2], self.trumpf):
+                winner = lastStich[1].owner
             else:
-                winner = tisch[2].owner
+                winner = lastStich[2].owner
 
-        for card in tisch:
+        for card in lastStich:
             points += card.point
         
         winner.points += points
@@ -545,32 +503,97 @@ class pyskat:
         print "%s bekommt den Stich (%d)" % (winner, points)
 
         # karten zurueck ins deck
-        self.deck.cards.extend(tisch)
+        #self.deck.cards.extend(self.stich)
 
         # calculate winner/vorhand index
         for x in range(len(self.players)):
             if winner == self.players[x]:
                 return x
 
+class pyskat:
+
+    def __init__(self):
+        self.deck = Deck()
+        self.tisch = Tisch()
+        self.round = 0
+        self.stich = 0
+        #self.tisch.players = []
+        #self.skat = []
+        #self.vorhand = 0
+        #self.handspiel = False
+        #self.trumpf = 0
+
+    def addPlayer(self, name):
+        if len(self.tisch.players) < 3:
+            self.tisch.players.append(Player(name, len(self.tisch.players)))
+        else:
+            print "Error: max. 3 Spieler"
+
+    def listPlayers(self):
+        print 70 * '-'
+        for player in self.tisch.players:
+            print player
+        print 70 * '-'
+
+    def printPlayerCards(self):
+        for player in self.tisch.players:
+            print player
+            player.printCards()
+            print 70 * '-'
+
+    def showSkat(self):
+        print "Karten im Skat:"
+        for card in self.tisch.skat:
+            print card
+        print 70 * '-'
+
+    def nextRound(self):
+        self.round += 1
+        self.tisch.vorhand = (self.tisch.vorhand + 1) % 3
+
+        self.deck.shuffle()
+        self.tisch.giveCards(self.deck.cards)
+
+        self.printPlayerCards()
+        self.showSkat()
+
+        for player in self.tisch.players:
+            player.reizen()
+    
+        print "Vorhand:    %s" % self.tisch.players[self.tisch.vorhand]
+        print "Mittelhand: %s" % self.tisch.players[(self.tisch.vorhand+1)%3]
+        print "Hinterhand: %s" % self.tisch.players[(self.tisch.vorhand+2)%3]
+        print 70 * '-'
+
+        self.tisch.reizen(self.tisch.vorhand)
+
+        self.showSkat()
+        self.printPlayerCards()
+
+        for i in range(10):
+            self.tisch.nextStich()
+
+        self.roundSummary(self.tisch.spielmacher)
+
     def roundSummary(self, player):
         re_pts = player.points
-        for card in self.skat:
+        for card in self.tisch.skat:
             re_pts += card.point
             self.deck.cards.append(card)
 
-        del self.skat[:]
+        del self.tisch.skat[:]
 
         # karten temporaer zurueckholen
         for card in self.deck.cards:
             if card.owner == player:
                 player.cards.append(card)
 
-        spielwert = reizen[self.trumpf] * player.getMaxReizwert()
+        spielwert = reizen[self.tisch.trumpf] * player.getMaxReizwert()
 
         kontra_pts = 120 - re_pts
 
         print 70 * '-'
-        print "Runde %d - Spiel: %s" % (self.round, suits[self.trumpf])
+        print "Runde %d - Spiel: %s" % (self.round, suits[self.tisch.trumpf])
         print "%s gereizt bis %d" % (player.name, player.gereizt)
 
         # nicht ueberreizt
@@ -583,10 +606,10 @@ class pyskat:
 
                 # schwarz gewonnen
                 if re_pts == 120:
-                    spielwert += reizen[self.trumpf]*2
+                    spielwert += reizen[self.tisch.trumpf]*2
                 # schneider gewonnen
                 elif re_pts > 90:
-                    spielwert += reizen[self.trumpf]
+                    spielwert += reizen[self.tisch.trumpf]
 
                 player.gesamt += spielwert
                 print "%s: + %d Punkte" % (player.name, spielwert)
@@ -598,10 +621,10 @@ class pyskat:
 
                 # schwarz verloren
                 if re_pts == 0:
-                    spielwert += reizen[self.trumpf]*2
+                    spielwert += reizen[self.tisch.trumpf]*2
                 # schneider verloren
                 elif re_pts < 30:
-                    spielwert += reizen[self.trumpf]
+                    spielwert += reizen[self.tisch.trumpf]
 
                 player.gesamt -= spielwert
                 print "%s: - %d Punkte" % (player.name, spielwert)
@@ -611,10 +634,14 @@ class pyskat:
             player.gesamt -= spielwert
             print "%s: - %d Punkte" % (player.name, spielwert)
 
-        # karten des gewinners zurueck ins deck
         del player.cards[:]
 
-        for spieler in self.players:
+        # karten zurueck ins deck
+        for stich in self.tisch.playedStiche:
+            self.deck.cards.extend(stich)
+        del self.tisch.playedStiche[:]
+
+        for spieler in self.tisch.players:
             spieler.re = False
             spieler.gereizt = 0
 
@@ -629,8 +656,8 @@ def main():
 
     skat.listPlayers()
 
-    skat.nextRound()
-    skat.nextRound()
+    for i in range(2):
+        skat.nextRound()
 
 if __name__ == '__main__':
     main()
