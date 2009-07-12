@@ -278,6 +278,7 @@ class Player:
                         return self
                     else:
                         return hoerer
+        return hoerer
 
     def doHoeren(self, ansage):
         # TODO: KI
@@ -316,7 +317,8 @@ class Player:
             # nur zwei fehl, skat noch leer
             if len(skat) == 0:
                 for farbe in classes:
-                    if len(farbe) == 2 and farbe[0].rank != ASS and farbe[1].rank != ASS:
+                    if (len(farbe) == 2 and farbe[0].rank != ASS and
+                            farbe[1].rank != ASS):
                         skat.append(farbe[0])
                         skat.append(farbe[1])
                         del farbe[0]
@@ -551,6 +553,9 @@ class pyskat:
         re_pts = player.points
         for card in self.skat:
             re_pts += card.point
+            self.deck.cards.append(card)
+
+        del self.skat[:]
 
         # karten temporaer zurueckholen
         for card in self.deck.cards:
@@ -581,19 +586,33 @@ class pyskat:
                         re_pts,
                         kontra_pts)
                 player.gesamt += spielwert
+                print "%s: + %d Punkte" % (player.name, spielwert)
             # spiel verloren
             else:
                 print "%s verliert mit %d zu %d Punkten" % (player.name,
                         re_pts,
                         kontra_pts)
+
+                # schwarz verloren
+                if re_pts == 0:
+                    spielwert += reizen[self.trumpf]*2
+                # schneider verloren
+                elif re_pts < 30:
+                    spielwert += reizen[self.trumpf]
+
                 player.gesamt -= spielwert
+                print "%s: - %d Punkte" % (player.name, spielwert)
         # ueberreizt
         else:
             print "Spiel (%d) ueberreizt - verloren!" % spielwert
             player.gesamt -= spielwert
+            print "%s: - %d Punkte" % (player.name, spielwert)
 
         # karten des gewinners zurueck ins deck
+
         del player.cards[:]
+
+        self.listPlayers()
 
 def main():
 
@@ -604,6 +623,7 @@ def main():
 
     skat.listPlayers()
 
+    skat.nextRound()
     skat.nextRound()
 
 if __name__ == '__main__':
