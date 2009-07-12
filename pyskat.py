@@ -184,7 +184,7 @@ class Player:
 
     def getMaxReizwert(self):
         jacks = []
-        reizwert = 0
+        max = 0
 
         for card in self.cards:
             if card.rank == BUBE:
@@ -194,19 +194,35 @@ class Player:
 
         # ohne 4 - spiel 5
         if len(jacks) == 0:
-            reizwert = 4
+            max = 4
         # mit ...
         elif jacks[0].suit == KREUZ:
             for x in jacks:
-                if x.suit == (KREUZ - 20*reizwert):
-                    reizwert += 1
+                if x.suit == (KREUZ - 20*max):
+                    max += 1
                 else:
                     break
         # ohne ...
         else:
-            reizwert = (KREUZ - jacks[0].suit) / 20
+            max = (KREUZ - jacks[0].suit) / 20
 
-        return reizwert+1
+        return max+1
+
+    def getBestSuit(self):
+        color = 0
+        max = 0
+
+        # finde farbe mit meisten karten
+        for suit in range(40, 101, 20):
+            i = 0
+            for card in self.cards:
+                if card.suit == suit and card.rank != JACK:
+                    i += 1
+            if i >= max:
+                color = suit
+                max = i
+
+        return color
 
     def playStich(self, tisch, trumpf):
         print "%s denkt nach..." % self.name
