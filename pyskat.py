@@ -66,6 +66,8 @@ class Card:
         elif self.rank == BUBE and other.rank == BUBE:
             if self.suit > other.suit:
                 return 1
+            elif self.suit == other.suit:
+                return 0
             else:
                 return -1
         # no jack
@@ -75,21 +77,24 @@ class Card:
             # ace
             if self.rank == ASS and other.rank != ASS:
                 return 1
-            elif self.rank == ASS and other.rank == ASS:
+            elif (self.rank == ASS and other.rank == ASS and
+                    self.suit == other.suit):
                 return 0
             elif other.rank == ASS:
                 return -1
             # ten
             elif self.rank == 10 and other.rank != 10:
                 return 1
-            elif self.rank == 10 and other.rank == 10:
+            elif (self.rank == 10 and other.rank == 10 and
+                    self.suit == other.suit):
                 return 0
             elif other.rank == 10:
                 return -1
             # others
             elif self.rank > other.rank:
                 return 1
-            elif self.rank == other.rank:
+            elif (self.rank == other.rank and
+                    self.suit == other.suit):
                 return 0
             else:
                 return -1
@@ -98,7 +103,13 @@ class Card:
         self.owner = player
 
     def isGreater(self, other, trumpf, null=False):
-        if not null:
+        if null:
+            # TODO: nullspiel (bzw. ramsch)
+            pass
+        elif not trumpf:
+            # TODO: grandspiel
+            pass
+        else:
             # trumpf ueber fehl
             if ((self.suit == trumpf or self.rank == BUBE) and
                     other.suit != trumpf and
@@ -135,10 +146,6 @@ class Card:
                     return False
             else:
                 return False
-
-        else:
-            # TODO: nullspiel
-            print "not implemented yet"
 
 class Deck:
 
@@ -240,6 +247,8 @@ class Player:
         return max
 
     def doSagen(self, hoerer):
+        # TODO: KI
+        #       nicht bis zum maximum reizen
         gehoert = False
         for wert in [18,20,22,23,24,27,30,33,36,40,44,45,48,50,55,60]:
             if self.gereizt >= wert:
@@ -259,14 +268,16 @@ class Player:
                 # sager passt sofort (keine 18)
                 if self.gereizt == 0:
                     return hoerer
-                # hoerer passt sofort
-                elif gehoert == False:
-                    return self
+                # sager passt, hoerer -> sager
+                elif gehoert == True:
+                    return hoerer
                 # sager passt, hoerer -> sager
                 else:
-                    return hoerer
+                    return self
 
     def doHoeren(self, ansage):
+        # TODO: KI
+        #       nicht bis zum maximum reizen
         if ansage <= self.reizen():
             self.gereizt = ansage
             print "%s sagt JA" % self.name
@@ -279,8 +290,8 @@ class Player:
         for i in range(len(skat)):
             skat[i].own(self)
             self.cards.append(skat[i])
-
         del skat[0]; del skat[0]
+
         # TODO: KI
         classes = []
         for suit in [40,60,80,100]:
@@ -418,19 +429,19 @@ class pyskat:
             player.printCards()
             print 70 * '-'
 
-    def giveCards(self):
+    def giveCards(self, vorhand):
         if len(self.players) == 3:
             self.deck.shuffle()
 
-            for player in self.players:
+            for z in range(3):
                 for i in range(3):
-                    player.giveCard(self.deck.cards.pop())
-            for player in self.players:
+                    self.players[(z+vorhand)%3].giveCard(self.deck.cards.pop())
+            for z in range(3):
                 for i in range(4):
-                    player.giveCard(self.deck.cards.pop())
-            for player in self.players:
+                    self.players[(z+vorhand)%3].giveCard(self.deck.cards.pop())
+            for z in range(3):
                 for i in range(3):
-                    player.giveCard(self.deck.cards.pop())
+                    self.players[(z+vorhand)%3].giveCard(self.deck.cards.pop())
 
             for i in range(2):
                 self.skat.append(self.deck.cards.pop())
@@ -446,7 +457,7 @@ class pyskat:
     def nextRound(self):
         self.round += 1
         self.vorhand = (self.vorhand + 1) % 3
-        self.giveCards()
+        self.giveCards(self.vorhand)
 
         self.printPlayerCards()
         self.showSkat()
