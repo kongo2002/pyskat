@@ -241,12 +241,12 @@ class Player:
 
     def doSagen(self, hoerer):
         gehoert = False
-        for wert in range(18,20,22,23,24,27,30,33,36,40,44,45,48,50,55,60):
+        for wert in [18,20,22,23,24,27,30,33,36,40,44,45,48,50,55,60]:
             if self.gereizt >= wert:
                 continue
             if wert <= self.reizen():
-                print "%s sagt %d" % (self.name, self.gereizt)
                 self.gereizt = wert
+                print "%s sagt %d" % (self.name, self.gereizt)
                 gehoert = hoerer.doHoeren(wert)
                 # hoerer passt
                 if gehoert == False:
@@ -257,8 +257,11 @@ class Player:
             else:
                 print "%s sagt PASSE" % self.name
                 # sager passt sofort (keine 18)
-                if self.gereizt = 0:
-                    return None
+                if self.gereizt == 0:
+                    return hoerer
+                # hoerer passt sofort
+                elif gehoert == False:
+                    return self
                 # sager passt, hoerer -> sager
                 else:
                     return hoerer
@@ -406,6 +409,8 @@ class pyskat:
             # TODO: beide passen
             pass
 
+        print "%s gewinnt das Reizen mit %d Punkten" % (gewinner.name,
+                gewinner.gereizt)
 
         for i in range(10):
             self.nextStich(60)
