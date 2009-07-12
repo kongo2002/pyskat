@@ -35,8 +35,8 @@ points = {  ASS:    11,
             9:      0,
             10:     10,
             BUBE:   2,
-            DAME:  3,
-            KOENIG:   4 }
+            DAME:   3,
+            KOENIG: 4 }
 
 reizen = {  PIK:    11,
             KREUZ:  12,
@@ -502,9 +502,6 @@ class Tisch:
 
         print "%s bekommt den Stich (%d)" % (winner, points)
 
-        # karten zurueck ins deck
-        #self.deck.cards.extend(self.stich)
-
         # calculate winner/vorhand index
         for x in range(len(self.players)):
             if winner == self.players[x]:
@@ -516,12 +513,6 @@ class pyskat:
         self.deck = Deck()
         self.tisch = Tisch()
         self.round = 0
-        self.stich = 0
-        #self.tisch.players = []
-        #self.skat = []
-        #self.vorhand = 0
-        #self.handspiel = False
-        #self.trumpf = 0
 
     def addPlayer(self, name):
         if len(self.tisch.players) < 3:
