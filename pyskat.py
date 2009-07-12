@@ -251,7 +251,7 @@ class Player:
         #       nicht bis zum maximum reizen
         gehoert = False
         for wert in [18,20,22,23,24,27,30,33,36,40,44,45,48,50,55,60]:
-            if self.gereizt >= wert:
+            if self.gereizt > wert:
                 continue
             if wert <= self.reizen():
                 self.gereizt = wert
@@ -271,9 +271,12 @@ class Player:
                 # sager passt, hoerer -> sager
                 elif gehoert == True:
                     return hoerer
-                # sager passt, hoerer -> sager
+                # sager passt sofort
                 else:
-                    return self
+                    if not hoerer.doHoeren(wert):
+                        return self
+                    else:
+                        return hoerer
 
     def doHoeren(self, ansage):
         # TODO: KI
@@ -287,10 +290,10 @@ class Player:
             return False
 
     def takeSkat(self, skat):
-        for i in range(len(skat)):
-            skat[i].own(self)
-            self.cards.append(skat[i])
-        del skat[0]; del skat[0]
+        for x in skat:
+            x.own(self)
+            self.cards.append(x)
+        del skat[:]
 
         # TODO: KI
         classes = []
@@ -304,6 +307,7 @@ class Player:
         while len(skat) < 2:
             # nur ein fehl, kein ass
             for farbe in classes:
+                print "* %s" % farbe
                 if len(skat) < 2 and len(farbe) == 1 and farbe[0].rank != ASS:
                     skat.append(farbe[0])
                     del farbe[0]
