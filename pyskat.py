@@ -275,6 +275,44 @@ class Player:
             print "%s sagt PASSE" % self.name
             return False
 
+    def takeSkat(self, skat):
+        for i in range(len(skat)):
+            self.cards.append(skat[i])
+            del skat[i]
+
+        # TODO: KI
+        classes = []
+        for suit in [40,60,80,100]:
+            suited = []
+            for card in self.cards:
+            if card.suit == suit and card.rank != BUBE:
+                suited.append(card)
+            classes.append(suited)
+
+        while len(skat) < 2:
+            # nur ein fehl, kein ass
+            for farbe in classes:
+                if len(skat) < 2 and len(farbe) == 1 and farbe[0].rank != ASS:
+                    skat.append(farbe[0])
+                    del farbe[0]
+                    continue
+            # nur zwei fehl, skat noch leer
+            if len(skat) == 0:
+                for farbe in classes:
+                    if len(farbe) == 2 and farbe[0] != ASS and farbe[1] != ASS:
+                        skat.append(farbe[0])
+                        skat.append(farbe[1])
+                        del farbe[0]
+                        del farbe[1]
+                        break
+
+        if len(skat) == 2:
+            return False
+        else:
+            # TODO: handspiel
+            return True
+
+
     def playStich(self, tisch, trumpf):
         print "%s denkt nach..." % self.name
 
@@ -341,6 +379,7 @@ class pyskat:
         self.players = []
         self.skat = []
         self.vorhand = 0
+        self.handspiel = False
 
     def addPlayer(self, name):
         if len(self.players) < 3:
@@ -403,11 +442,13 @@ class pyskat:
 
         # reizen
         gewinner = self.players[(self.vorhand+1)%3].doSagen(self.players[self.vorhand])
-        if gewinner != None:
-            gewinner = gewinner.doSagen(self.players[(self.vorhand+2)%3])
-        else:
-            # TODO: beide passen
+        gewinner = gewinner.doSagen(self.players[(self.vorhand+2)%3])
+
+        if gewinner.gereizt == 0:
+            # TODO: alle passen -> ramsch
             pass
+        else:
+            handspiel = gewinner.takeSkat()
 
         print "%s gewinnt das Reizen mit %d Punkten" % (gewinner.name,
                 gewinner.gereizt)
