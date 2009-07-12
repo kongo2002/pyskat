@@ -38,6 +38,11 @@ points = {  ASS:    11,
             DAME:  3,
             KOENIG:   4 }
 
+reizen = {  PIK:    11,
+            KREUZ:  12,
+            KARO:   9,
+            HERZ:   10 }
+
 # CLASSES
 
 class Card:
@@ -206,23 +211,31 @@ class Player:
         else:
             max = (KREUZ - jacks[0].suit) / 20
 
+        #print "%s: %d" % (self.name, max+1)
         return max+1
 
     def getBestSuit(self):
         color = 0
         max = 0
 
+        # TODO: bei gleicher Anzahl die 'bessere' farbe
+        #       waehlen
         # finde farbe mit meisten karten
         for suit in range(40, 101, 20):
             i = 0
             for card in self.cards:
-                if card.suit == suit and card.rank != JACK:
+                if card.suit == suit and card.rank != BUBE:
                     i += 1
             if i >= max:
                 color = suit
                 max = i
 
+        #print "%s: %s (%d)" % (self.name, suits[color], max)
         return color
+
+    def reizen(self):
+        print "%s: kann bis %d reizen" % (self.name, 
+                reizen[self.getBestSuit()]*self.getMaxReizwert())
 
     def playStich(self, tisch, trumpf):
         print "%s denkt nach..." % self.name
@@ -343,7 +356,7 @@ class pyskat:
         self.showSkat()
 
         for player in self.players:
-            print player, ": ", player.getMaxReizwert()
+            player.reizen()
     
         print "Vorhand:    %s" % self.players[self.vorhand]
         print "Mittelhand: %s" % self.players[(self.vorhand+1)%3]
