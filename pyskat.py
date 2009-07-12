@@ -234,8 +234,32 @@ class Player:
         return color
 
     def reizen(self):
-        print "%s: kann bis %d reizen" % (self.name, 
-                reizen[self.getBestSuit()]*self.getMaxReizwert())
+        max = reizen[self.getBestSuit()]*self.getMaxReizwert() 
+
+        print "%s: kann bis %d reizen" % (self.name, max)
+        return max
+
+    def doSagen(self, hoerer):
+        gehoert = False
+        for wert in range(18,20,22,23,24,27,30,33,36,40,44,45,48,50,55,60):
+            if wert <= self.reizen():
+                print "%s sagt %d" % (self.name, self.gereizt)
+                self.gereizt = wert
+                gehoert = hoerer.doHoeren(wert)
+                # hoerer passt
+                if gehoert == False:
+                    return self
+                else:
+                    continue
+            # sager reizt nicht (weiter)
+            else:
+                print "%s sagt PASSE" % self.name
+                # sager passt sofort (keine 18)
+                if self.gereizt = 0:
+                    return None
+                # sager passt, hoerer -> sager
+                else:
+                    return hoerer
 
     def playStich(self, tisch, trumpf):
         print "%s denkt nach..." % self.name
@@ -363,7 +387,14 @@ class pyskat:
         print "Hinterhand: %s" % self.players[(self.vorhand+2)%3]
         print 70 * '-'
 
-        # TODO: reizen
+        # reizen
+        gewinner = self.players[(self.vorhand+1)%3].doSagen(self.players[self.vorhand])
+        if gewinner != None:
+            gewinner = gewinner.doSagen(self.players[(self.vorhand+2)%3])
+        else:
+            # TODO: beide passen
+            pass
+
 
         for i in range(10):
             self.nextStich(60)
