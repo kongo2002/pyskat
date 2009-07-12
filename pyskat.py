@@ -242,6 +242,8 @@ class Player:
     def doSagen(self, hoerer):
         gehoert = False
         for wert in range(18,20,22,23,24,27,30,33,36,40,44,45,48,50,55,60):
+            if self.gereizt >= wert:
+                continue
             if wert <= self.reizen():
                 print "%s sagt %d" % (self.name, self.gereizt)
                 self.gereizt = wert
@@ -263,6 +265,7 @@ class Player:
 
     def doHoeren(self, ansage):
         if ansage <= self.reizen():
+            self.gereizt = ansage
             print "%s sagt JA" % self.name
             return True
         else:
