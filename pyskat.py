@@ -249,7 +249,7 @@ class Player:
     def reizen(self):
         max = reizen[self.getBestSuit()]*self.getMaxReizwert() 
 
-        #print "%s: kann bis %d reizen" % (self.name, max)
+        print "%s: kann bis %d reizen" % (self.name, max)
         return max
 
     def doSagen(self, hoerer):
@@ -439,18 +439,22 @@ class Tisch:
 
     def giveCards(self, cards):
         if len(self.players) == 3:
+            # jeweils drei karten geben
             for z in range(3):
                 for i in range(3):
                     self.players[(z+self.vorhand)%3].giveCard(cards.pop())
+            # skat geben
+            for i in range(2):
+                self.skat.append(cards.pop())
+            # jeweils vier karten geben
             for z in range(3):
                 for i in range(4):
                     self.players[(z+self.vorhand)%3].giveCard(cards.pop())
+            # jeweils drei karten geben
             for z in range(3):
                 for i in range(3):
                     self.players[(z+self.vorhand)%3].giveCard(cards.pop())
 
-            for i in range(2):
-                self.skat.append(cards.pop())
         else:
             print "Error: 3 Spieler noetig"
 
@@ -579,12 +583,20 @@ class pyskat:
 
         del self.tisch.skat[:]
 
+        # karten zurueck ins deck
+        for stich in self.tisch.playedStiche:
+            self.deck.cards.extend(stich)
+        del self.tisch.playedStiche[:]
+
         # karten temporaer zurueckholen
         for card in self.deck.cards:
             if card.owner == player:
                 player.cards.append(card)
 
+        print player.cards
         spielwert = reizen[self.tisch.trumpf] * player.getMaxReizwert()
+
+        print spielwert
 
         kontra_pts = 120 - re_pts
 
@@ -627,19 +639,16 @@ class pyskat:
         # ueberreizt
         else:
             print "Spiel (%d) ueberreizt - verloren!" % spielwert
+            spielwert = player.gereizt * 2
             player.gesamt -= spielwert
             print "%s: - %d Punkte" % (player.name, spielwert)
 
         del player.cards[:]
 
-        # karten zurueck ins deck
-        for stich in self.tisch.playedStiche:
-            self.deck.cards.extend(stich)
-        del self.tisch.playedStiche[:]
-
         for spieler in self.tisch.players:
             spieler.re = False
             spieler.gereizt = 0
+            spieler.points = 0
 
         self.listPlayers()
 
