@@ -16,23 +16,23 @@ def fehl(trumpf):
     return [x for x in [KARO, HERZ, PIK, KREUZ] if x != trumpf]
 
 def splitCards(cards, trumpf):
-    dict = {}
+    dic = {}
     # fehl karten aufsplitten
     for farbe in fehl(trumpf):
-        list = []
+        clist = []
         for card in cards:
             if card.suit == farbe and card.rank != BUBE:
-                list.append(card)
-        list.sort(reverse=True)
-        dict[farbe] = list
+                clist.append(card)
+        clist.sort(reverse=True)
+        dic[farbe] = clist
     # trumpf aufsplitten
-    list = []
+    clist = []
     for card in cards:
         if card.suit == trumpf or card.rank == BUBE:
-            list.append(card)
-    list.sort(reverse=True)
-    dict[trumpf] = list
-    return dict
+            clist.append(card)
+    clist.sort(reverse=True)
+    dic[trumpf] = clist
+    return dic
 
 def aufspielen(spieler, tisch):
     # eigene karten 
@@ -42,10 +42,10 @@ def aufspielen(spieler, tisch):
     # gespielte karten
     played = {}
     if len(tisch.playedStiche) > 0:
-        list = []
+        clist = []
         for stiche in tisch.playedStiche:
-            list.extend(stiche)
-        played = splitCards(list, tisch.trumpf)
+            clist.extend(stiche)
+        played = splitCards(clist, tisch.trumpf)
 
     if spieler.re == True:
         print "%s (Re) kommt raus" % spieler.name
