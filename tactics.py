@@ -68,8 +68,8 @@ def aufspielen(spieler, tisch):
     # kurzen fehl spielen
     count = 12
     to_play = 0
-    for farbe in own:
-        if len(own[farbe]) < 12 and len(own[farbe]) != 0:
+    for farbe in fehl(tisch.trumpf):
+        if len(own[farbe]) < count and len(own[farbe]) != 0:
             to_play = farbe
     # TODO: 10 spielen, wenn ass schon raus
     #       stechen/schmieren kalkulieren
@@ -145,6 +145,7 @@ def bedienen(spieler, tisch, possible):
                     return possible[len(possible)-1]
         # sitzt in der mitte
         else:
+            # TODO: wo sitzt Partner?
             # versuche stich zu bekommen
             wahl = None
             for card in possible:
