@@ -387,6 +387,7 @@ class Player:
                     if tisch.stich[0].suit == j.suit and j.rank != BUBE:
                         possible_cards.append(j)
 
+            possible_cards.sort(reverse=True)
             print possible_cards
 
             # stechen/schmieren

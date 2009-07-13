@@ -79,3 +79,82 @@ def aufspielen(spieler, tisch):
     # hohen trumpf spielen
     # TODO: gespielte truempfe einberechnen
     return own[tisch.trumpf][0]
+
+def bedienen(spieler, tisch, possible):
+    # spielmacher
+    if spieler.re:
+        # sitzt hinten
+        if len(tisch.stich) == 2:
+            # hoechste karte
+            if spieler.isGreater(tisch.stich[0], tisch.stich[1], tisch.trumpf):
+                highest = tisch.stich[0]
+            else:
+                highest = tisch.stich[1]
+            # versuche drueber zu kommen
+            wahl = None
+            for card in possible:
+                if isGreater(card, highest):
+                    wahl = card
+                else:
+                    break
+            if wahl:
+                return wahl
+            # ansonsten den kleinsten
+            else:
+                return possible[len(possible)-1]
+        # sitzt in der mitte
+        else:
+            # versuche stich zu bekommen
+            wahl = None
+            for card in possible:
+                if isGreater(card, tisch.stich[0]):
+                    wahl = card
+                else:
+                    break
+            if wahl:
+                return wahl
+            # ansonsten den kleinsten
+            else:
+                return possible[len(possible)-1]
+    # kontra
+    else:
+        # sitzt hinten
+        if len(tisch.stich) == 2:
+            # hoechste karte
+            if spieler.isGreater(tisch.stich[0], tisch.stich[1], tisch.trumpf):
+                highest = tisch.stich[0]
+            else:
+                highest = tisch.stich[1]
+            # partner hat den stich
+            if not highest.owner.re:
+                # kleinsten nehmen
+                # TODO: AI
+                return possible[len(possible)-1]
+            # ansonsten, versuche stich zu bekommen
+            else:
+                wahl = None
+                for card in possible:
+                    if isGreater(card, highest):
+                        wahl = card
+                    else:
+                        break
+                if wahl:
+                    return wahl
+                # ansonsten den kleinsten
+                else:
+                    return possible[len(possible)-1]
+        # sitzt in der mitte
+        else:
+            # versuche stich zu bekommen
+            wahl = None
+            for card in possible:
+                if isGreater(card, tisch.stich[0]):
+                    wahl = card
+                else:
+                    break
+            if wahl:
+                return wahl
+            # ansonsten den kleinsten
+            else:
+                return possible[len(possible)-1]
+
