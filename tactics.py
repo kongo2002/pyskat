@@ -12,40 +12,40 @@ DAME = 12
 KOENIG = 13
 ASS = 1
 
+def fehl(trumpf):
+    return [x for x in [KARO, HERZ, PIK, KREUZ] if x != trumpf]
+
+def splitCards(cards, trumpf):
+    dict = {}
+    # fehl karten aufsplitten
+    for farbe in fehl(trumpf):
+        list = []
+        for card in cards:
+            if card.suit == farbe and card.rank != BUBE:
+                list.append(card)
+        list.sort(reverse=True)
+        dict[farbe] = list
+    # trumpf aufsplitten
+    list = []
+    for card in cards:
+        if card.suit == trumpf or card.rank == BUBE:
+            list.append(card)
+    list.sort(reverse=True)
+    dict[trumpf] = list
+    return dict
+
 def aufspielen(spieler, tisch):
-    # eigene fehl bestimmen
-    own = []
-    for farbe in range(40, 101, 20):
-        if farbe != tisch.trumpf:
-            farb = []
-            for card in spieler.cards:
-                if card.suit == farbe and card.rank != BUBE:
-                    farb.append(card)
-            own.append(farb)
-    # eigene trumpf bestimmen
-    own_trumpf = []
-    for card in spieler.cards:
-        if card.suit == tisch.trumpf or card.rank == BUBE:
-            own_trumpf.append(card)
+    # eigene karten 
+    own = {}
+    own = splitCards(spieler.cards, tisch.trumpf)
 
-
+    # gespielte karten
+    played = {}
     if len(tisch.playedStiche) > 0:
-        # gespielte fehl bestimmen
-        played = []
-        for farbe in range(40, 101, 20):
-            if farbe != tisch.trumpf:
-                farb = []
-                for i in tisch.playedStiche:
-                    for j in i:
-                        if j.suit == farbe and j.rank != BUBE:
-                            farb.append(j)
-                played.append(farb)
-        # gespielte trumpf bestimmen
-        played_trumpf = []
-        for i in tisch.playedStiche:
-            for j in i:
-                if j.suit == tisch.trumpf or j.rank == BUBE:
-                    played_trumpf.append(j)
+        list = []
+        for stiche in tisch.playedStiche:
+            list.extend(stiche)
+        played = splitCards(list, tisch.trumpf)
 
     if spieler.re == True:
         print "%s (Re) kommt raus" % spieler.name
@@ -67,17 +67,15 @@ def aufspielen(spieler, tisch):
 
     # kurzen fehl spielen
     count = 12
-    to_play = None
+    to_play = 0
     for farbe in own:
-        if len(farbe) < 12 and len(farbe) != 0:
+        if len(own[farbe]) < 12 and len(own[farbe]) != 0:
             to_play = farbe
     # TODO: 10 spielen, wenn ass schon raus
     #       stechen/schmieren kalkulieren
     if to_play:
-        to_play.sort(reverse=True)
-        return to_play[0]
+        return own[to_play][0]
 
     # hohen trumpf spielen
     # TODO: gespielte truempfe einberechnen
-    own_trumpf.sort(reverse=True)
-    return own_trumpf[0]
+    return own[tisch.trumpf][0]
