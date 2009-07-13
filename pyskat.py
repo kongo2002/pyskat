@@ -593,10 +593,7 @@ class pyskat:
             if card.owner == player:
                 player.cards.append(card)
 
-        print player.cards
         spielwert = reizen[self.tisch.trumpf] * player.getMaxReizwert()
-
-        print spielwert
 
         kontra_pts = 120 - re_pts
 
