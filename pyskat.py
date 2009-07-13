@@ -2,6 +2,7 @@
 
 # Last Change: Jul 13, 2009
 
+import tactics
 import random
 import sys
 
@@ -365,9 +366,10 @@ class Player:
         if len(tisch.stich) == 0:
             # TODO: intelligente kartenauswahl
             # play random card
-            i = random.randint(0, len(self.cards)-1)
-            print "%s: %s" % (self.name, str(self.cards[i]))
-            return self.cards[i]
+            #i = random.randint(0, len(self.cards)-1)
+            #print "%s: %s" % (self.name, str(self.cards[i]))
+            #return self.cards[i]
+            return tactics.aufspielen(self, tisch)
 
         # bedienen
         else:
@@ -392,7 +394,7 @@ class Player:
                 # TODO: intelligente kartenauswahl
                 # play random card
                 i = random.randint(0, len(self.cards)-1)
-                print "%s: %s" % (self.name, str(self.cards[i]))
+                #print "%s: %s" % (self.name, str(self.cards[i]))
                 return self.cards[i]
             # bedienen
             else:
@@ -401,7 +403,7 @@ class Player:
                 else:
                     # TODO: intelligente kartenauswahl
                     i = random.randint(0, len(possible_cards)-1)
-                print "%s: %s" % (self.name, str(possible_cards[i]))
+                #print "%s: %s" % (self.name, str(possible_cards[i]))
                 return possible_cards[i]
 
         print "Tisch: ", tisch
@@ -420,6 +422,7 @@ class Tisch:
         self.spielmacher = None
 
     def playCard(self, card):
+        print "%s: %s" % (card.owner.name, card)
         self.stich.append(card)
 
         # remove played card from player

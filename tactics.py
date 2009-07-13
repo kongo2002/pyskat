@@ -2,15 +2,26 @@
 
 # Last Change: Jul 13, 2009
 
+KARO = 40
+HERZ = 60
+PIK = 80
+KREUZ = 100
+
+BUBE = 11
+DAME = 12
+KOENIG = 13
+ASS = 1
+
 def aufspielen(spieler, tisch):
     # eigene fehl bestimmen
     own = []
-    for farbe in (range(40, 101, 20) if not tisch.trumpf):
-        farb = []
-        for card in spieler.cards:
-            if card.suit == farbe and card.rank != BUBE:
-                farb.append(card)
-        own.append(farb)
+    for farbe in range(40, 101, 20):
+        if farbe != tisch.trumpf:
+            farb = []
+            for card in spieler.cards:
+                if card.suit == farbe and card.rank != BUBE:
+                    farb.append(card)
+            own.append(farb)
     # eigene trumpf bestimmen
     own_trumpf = []
     for card in spieler.cards:
@@ -21,22 +32,20 @@ def aufspielen(spieler, tisch):
     if len(tisch.playedStiche) > 0:
         # gespielte fehl bestimmen
         played = []
-        for farbe in (range(40, 101, 20) if not tisch.trumpf):
-            farb = []
-            for i in tisch.stiche:
-                for j in i:
-                    if j.suit == farbe and j.rank != BUBE:
-                        farb.append(j)
-            played.append(farb)
+        for farbe in range(40, 101, 20):
+            if farbe != tisch.trumpf:
+                farb = []
+                for i in tisch.playedStiche:
+                    for j in i:
+                        if j.suit == farbe and j.rank != BUBE:
+                            farb.append(j)
+                played.append(farb)
         # gespielte trumpf bestimmen
         played_trumpf = []
-        for i in tisch.stiche:
+        for i in tisch.playedStiche:
             for j in i:
                 if j.suit == tisch.trumpf or j.rank == BUBE:
                     played_trumpf.append(j)
-
-    else:
-        print "Erster Stich"
 
     if spieler.re == True:
         print "%s (Re) kommt raus" % spieler.name
@@ -47,7 +56,7 @@ def aufspielen(spieler, tisch):
     ace = None
     for card in spieler.cards:
         if card.rank == ASS and card.suit != tisch.trumpf:
-            if ace == None:
+            if not ace:
                 ace = card
             # wenn mehrere, dann die kuerzeste farbe
             else:
