@@ -400,12 +400,12 @@ class Player:
             # bedienen
             else:
                 if len(possible_cards) == 1:
-                    i = 0
+                    return possible_cards[0]
                 else:
                     # TODO: intelligente kartenauswahl
-                    i = random.randint(0, len(possible_cards)-1)
+                    #i = random.randint(0, len(possible_cards)-1)
+                    return tactics.bedienen(self, tisch, possible_cards)
                 #print "%s: %s" % (self.name, str(possible_cards[i]))
-                return possible_cards[i]
 
         print "Tisch: ", tisch
         return tisch

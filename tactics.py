@@ -86,14 +86,14 @@ def bedienen(spieler, tisch, possible):
         # sitzt hinten
         if len(tisch.stich) == 2:
             # hoechste karte
-            if spieler.isGreater(tisch.stich[0], tisch.stich[1], tisch.trumpf):
+            if tisch.stich[0].isGreater(tisch.stich[1], tisch.trumpf):
                 highest = tisch.stich[0]
             else:
                 highest = tisch.stich[1]
             # versuche drueber zu kommen
             wahl = None
             for card in possible:
-                if isGreater(card, highest):
+                if card.isGreater(highest, tisch.trumpf):
                     wahl = card
                 else:
                     break
@@ -107,7 +107,7 @@ def bedienen(spieler, tisch, possible):
             # versuche stich zu bekommen
             wahl = None
             for card in possible:
-                if isGreater(card, tisch.stich[0]):
+                if card.isGreater(tisch.stich[0], tisch.trumpf):
                     wahl = card
                 else:
                     break
@@ -121,7 +121,7 @@ def bedienen(spieler, tisch, possible):
         # sitzt hinten
         if len(tisch.stich) == 2:
             # hoechste karte
-            if spieler.isGreater(tisch.stich[0], tisch.stich[1], tisch.trumpf):
+            if tisch.stich[0].isGreater(tisch.stich[1], tisch.trumpf):
                 highest = tisch.stich[0]
             else:
                 highest = tisch.stich[1]
@@ -134,7 +134,7 @@ def bedienen(spieler, tisch, possible):
             else:
                 wahl = None
                 for card in possible:
-                    if isGreater(card, highest):
+                    if card.isGreater(highest, tisch.trumpf):
                         wahl = card
                     else:
                         break
@@ -148,7 +148,7 @@ def bedienen(spieler, tisch, possible):
             # versuche stich zu bekommen
             wahl = None
             for card in possible:
-                if isGreater(card, tisch.stich[0]):
+                if card.isGreater(tisch.stich[0], tisch.trumpf):
                     wahl = card
                 else:
                     break
