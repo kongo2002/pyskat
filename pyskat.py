@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# Last Change: Jul 13, 2009
+
 import random
 import sys
 
@@ -246,7 +248,7 @@ class Player:
     def reizen(self):
         max = reizen[self.getBestSuit()]*self.getMaxReizwert() 
 
-        print "%s: kann bis %d reizen" % (self.name, max)
+        #print "%s: kann bis %d reizen" % (self.name, max)
         return max
 
     def doSagen(self, hoerer):

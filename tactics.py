@@ -40,15 +40,35 @@ def aufspielen(spieler, tisch):
 
     if spieler.re == True:
         print "%s (Re) kommt raus" % spieler.name
-
-        # ass spielen, wenn kein trumpf
-        ace = None
-        for card in spieler.cards:
-            if card.rank == ASS and card.suit != tisch.trumpf:
-                if ace == None:
-                    ace = card
-                # wenn mehrere, dann die kuerzeste farbe
-                else:
-
     else:
         print "%s (Kontra) kommt raus" % spieler.name
+
+    # ass spielen, wenn kein trumpf
+    ace = None
+    for card in spieler.cards:
+        if card.rank == ASS and card.suit != tisch.trumpf:
+            if ace == None:
+                ace = card
+            # wenn mehrere, dann die kuerzeste farbe
+            else:
+                # TODO
+                pass
+    if ace:
+        return ace
+
+    # kurzen fehl spielen
+    count = 12
+    to_play = None
+    for farbe in own:
+        if len(farbe) < 12 and len(farbe) != 0:
+            to_play = farbe
+    # TODO: 10 spielen, wenn ass schon raus
+    #       stechen/schmieren kalkulieren
+    if to_play:
+        to_play.sort(reverse=True)
+        return to_play[0]
+
+    # hohen trumpf spielen
+    # TODO: gespielte truempfe einberechnen
+    own_trumpf.sort(reverse=True)
+    return own_trumpf[0]
