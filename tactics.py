@@ -295,3 +295,21 @@ def stechenSchmieren(spieler, tisch):
                             if len(own[farbe]) == 1:
                                 wahl = card
                 return wahl
+
+def rateCards(spieler):
+    buben = 0
+    max_farbe = 0
+    max_fehlass = 0
+
+    # TODO: rating fuer farben stechen
+
+    for card in spieler.cards:
+        if card.rank == BUBE:
+            buben += 1
+        elif card.suit == spieler.getBestSuit():
+            max_farbe += 1
+        elif card.rank == ASS:
+            max_fehlass += 1
+
+    return buben*1.5+max_farbe+max_fehlass
+

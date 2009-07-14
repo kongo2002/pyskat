@@ -207,7 +207,8 @@ class Player:
     def reizen(self):
         max = REIZEN[self.getBestSuit()]*self.getMaxReizwert() 
 
-        print "%s: kann bis %d reizen" % (self.name, max)
+        print "%s: kann bis %d reizen (Rating=%d)" % (self.name, max,
+                tactics.rateCards(self))
         return max
 
     def doSagen(self, hoerer):
