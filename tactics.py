@@ -1,16 +1,7 @@
 #!/usr/bin/env python
+# Last Change: Jul 14, 2009
 
-# Last Change: Jul 13, 2009
-
-KARO = 40
-HERZ = 60
-PIK = 80
-KREUZ = 100
-
-BUBE = 11
-DAME = 12
-KOENIG = 13
-ASS = 1
+from pyskatrc import *
 
 def fehl(trumpf):
     return [x for x in [KARO, HERZ, PIK, KREUZ] if x != trumpf]
@@ -158,4 +149,3 @@ def bedienen(spieler, tisch, possible):
             # ansonsten den kleinsten
             else:
                 return possible[len(possible)-1]
-

@@ -1,66 +1,24 @@
 #!/usr/bin/env python
+# Last Change: Jul 14, 2009
 
-# Last Change: Jul 13, 2009
-
+from pyskatrc import *
 import tactics
 import random
 import sys
-
-# CONSTANTS
-
-KARO = 40
-HERZ = 60
-PIK = 80
-KREUZ = 100
-
-BUBE = 11
-DAME = 12
-KOENIG = 13
-ASS = 1
-
-suits = {   PIK:    'Pik',
-            KREUZ:  'Kreuz',
-            KARO:   'Karo',
-            HERZ:   'Herz' }
-
-ranks = {   ASS:    'Ass',
-            7:      'Sieben',
-            8:      'Acht',
-            9:      'Neun',
-            10:     'Zehn',
-            BUBE:   'Bube',
-            DAME:   'Dame',
-            KOENIG: 'Koenig' }
-
-points = {  ASS:    11,
-            7:      0,
-            8:      0,
-            9:      0,
-            10:     10,
-            BUBE:   2,
-            DAME:   3,
-            KOENIG: 4 }
-
-reizen = {  PIK:    11,
-            KREUZ:  12,
-            KARO:   9,
-            HERZ:   10 }
-
-# CLASSES
 
 class Card:
 
     def __init__(self, id):
         self.suit = id - id % 20
         self.rank = id % 20
-        self.point = points[self.rank]
+        self.point = POINTS[self.rank]
         self.owner = None
 
     def __repr__(self):
         return str(self)
 
     def __str__(self):
-        return "%s %s (%d)" % (suits[self.suit], ranks[self.rank], self.point)
+        return "%s %s (%d)" % (SUITS[self.suit], RANKS[self.rank], self.point)
 
     def __cmp__(self, other):
         # jack
@@ -243,11 +201,11 @@ class Player:
                 color = suit
                 max = i
 
-        #print "%s: %s (%d)" % (self.name, suits[color], max)
+        #print "%s: %s (%d)" % (self.name, SUITS[color], max)
         return color
 
     def reizen(self):
-        max = reizen[self.getBestSuit()]*self.getMaxReizwert() 
+        max = REIZEN[self.getBestSuit()]*self.getMaxReizwert() 
 
         print "%s: kann bis %d reizen" % (self.name, max)
         return max
@@ -477,7 +435,7 @@ class Tisch:
 
     def nextStich(self):
         print "*** Stich %d ***" % (len(self.playedStiche)+1)
-        print "*** Spiel: %s ***" % suits[self.trumpf]
+        print "*** Spiel: %s ***" % SUITS[self.trumpf]
 
         self.playCard(self.players[self.vorhand].playStich(self))
         self.playCard(self.players[(self.vorhand+1)%3].playStich(self))
@@ -594,12 +552,12 @@ class pyskat:
             if card.owner == player:
                 player.cards.append(card)
 
-        spielwert = reizen[self.tisch.trumpf] * player.getMaxReizwert()
+        spielwert = REIZEN[self.tisch.trumpf] * player.getMaxReizwert()
 
         kontra_pts = 120 - re_pts
 
         print 70 * '-'
-        print "Runde %d - Spiel: %s" % (self.round, suits[self.tisch.trumpf])
+        print "Runde %d - Spiel: %s" % (self.round, SUITS[self.tisch.trumpf])
         print "%s gereizt bis %d" % (player.name, player.gereizt)
 
         # nicht ueberreizt
@@ -612,10 +570,10 @@ class pyskat:
 
                 # schwarz gewonnen
                 if re_pts == 120:
-                    spielwert += reizen[self.tisch.trumpf]*2
+                    spielwert += REIZEN[self.tisch.trumpf]*2
                 # schneider gewonnen
                 elif re_pts > 90:
-                    spielwert += reizen[self.tisch.trumpf]
+                    spielwert += REIZEN[self.tisch.trumpf]
 
                 player.gesamt += spielwert
                 print "%s: + %d Punkte" % (player.name, spielwert)
@@ -627,10 +585,10 @@ class pyskat:
 
                 # schwarz verloren
                 if re_pts == 0:
-                    spielwert += reizen[self.tisch.trumpf]*2
+                    spielwert += REIZEN[self.tisch.trumpf]*2
                 # schneider verloren
                 elif re_pts < 30:
-                    spielwert += reizen[self.tisch.trumpf]
+                    spielwert += REIZEN[self.tisch.trumpf]
 
                 player.gesamt -= spielwert
                 print "%s: - %d Punkte" % (player.name, spielwert)
