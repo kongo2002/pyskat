@@ -347,10 +347,7 @@ class Player:
             # stechen/schmieren
             if len(possible_cards) == 0:
                 # TODO: intelligente kartenauswahl
-                # play random card
-                i = random.randint(0, len(self.cards)-1)
-                #print "%s: %s" % (self.name, str(self.cards[i]))
-                return self.cards[i]
+                return tactics.stechenSchmieren(self, tisch)
             # bedienen
             else:
                 if len(possible_cards) == 1:

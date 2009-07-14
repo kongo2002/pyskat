@@ -173,7 +173,7 @@ def stechenSchmieren(spieler, tisch):
             else:
                 highest = tisch.stich[1]
             # nicht nur luschen?
-            if (tisch.stich[0].points + tisch.stich[1].points) >= 3:
+            if (tisch.stich[0].point + tisch.stich[1].point) >= 3:
                 # versuche drueber zu kommen
                 wahl = None
                 for card in own[tisch.trumpf]:
@@ -188,10 +188,10 @@ def stechenSchmieren(spieler, tisch):
             for farbe in fehl(tisch.trumpf):
                 for card in own[farbe]:
                     # kleinsten fehl aufwaehlen
-                    if not wahl or wahl.points > card.points:
+                    if not wahl or wahl.point > card.point:
                         wahl = card
                     # wenn gleich, farbe stechen
-                    elif wahl.points == card.points:
+                    elif wahl.point == card.point:
                         if len(own[farbe]) == 1:
                             wahl = card
             # TODO: AI
@@ -212,10 +212,10 @@ def stechenSchmieren(spieler, tisch):
                 for farbe in fehl(tisch.trumpf):
                     for card in own[farbe]:
                         # kleinsten fehl aufwaehlen
-                        if not wahl or wahl.points > card.points:
+                        if not wahl or wahl.point > card.point:
                             wahl = card
                         # wenn gleich, farbe stechen
-                        elif wahl.points == card.points:
+                        elif wahl.point == card.point:
                             if len(own[farbe]) == 1:
                                 wahl = card
                 return wahl
@@ -235,9 +235,9 @@ def stechenSchmieren(spieler, tisch):
                 wahl = None
                 for farbe in fehl(tisch.trumpf):
                     for card in own[farbe]:
-                        if not wahl or card.points > wahl.points:
+                        if not wahl or card.point > wahl.point:
                             wahl = card
-                        elif wahl.points == card.points:
+                        elif wahl.point == card.point:
                             if len(own[farbe]) == 1:
                                 wahl = card
                 return wahl
@@ -260,10 +260,10 @@ def stechenSchmieren(spieler, tisch):
                 for farbe in fehl(tisch.trumpf):
                     for card in own[farbe]:
                         # kleinsten fehl aufwaehlen
-                        if not wahl or wahl.points > card.points:
+                        if not wahl or wahl.point > card.point:
                             wahl = card
                         # wenn gleich, farbe stechen
-                        elif wahl.points == card.points:
+                        elif wahl.point == card.point:
                             if len(own[farbe]) == 1:
                                 wahl = card
                 return wahl
@@ -282,10 +282,10 @@ def stechenSchmieren(spieler, tisch):
                 for farbe in fehl(tisch.trumpf):
                     for card in own[farbe]:
                         # kleinsten fehl aufwaehlen
-                        if not wahl or wahl.points > card.points:
+                        if not wahl or wahl.point > card.point:
                             wahl = card
                         # wenn gleich, farbe stechen
-                        elif wahl.points == card.points:
+                        elif wahl.point == card.point:
                             if len(own[farbe]) == 1:
                                 wahl = card
                 return wahl
