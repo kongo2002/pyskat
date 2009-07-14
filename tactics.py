@@ -9,6 +9,9 @@ def fehl(trumpf):
 def smallest(farbe):
     return farbe[-1]
 
+def biggest(farbe):
+    return farbe[0]
+
 def splitCards(cards, trumpf):
     dic = {}
     # fehl karten aufsplitten
@@ -78,18 +81,18 @@ def aufspielen(spieler, tisch):
 
     # kurzen fehl spielen
     count = 12
-    to_play = 0
+    wahl = 0
     for farbe in fehl(tisch.trumpf):
         if len(own[farbe]) < count and len(own[farbe]) != 0:
-            to_play = farbe
+            wahl = farbe
     # TODO: 10 spielen, wenn ass schon raus
     #       stechen/schmieren kalkulieren
-    if to_play:
-        return own[to_play][0]
+    if wahl:
+        return biggest(own[wahl])
 
     # hohen trumpf spielen
     # TODO: gespielte truempfe einberechnen
-    return own[tisch.trumpf][0]
+    return biggest(own[tisch.trumpf])
 
 def bedienen(spieler, tisch, possible):
     # spielmacher
@@ -112,7 +115,7 @@ def bedienen(spieler, tisch, possible):
                 return wahl
             # ansonsten den kleinsten
             else:
-                return possible[len(possible)-1]
+                return smallest(possible)
         # sitzt in der mitte
         else:
             # versuche stich zu bekommen
@@ -140,7 +143,7 @@ def bedienen(spieler, tisch, possible):
             if not highest.owner.re:
                 # kleinsten nehmen
                 # TODO: AI
-                return possible[len(possible)-1]
+                return smallest(possible)
             # ansonsten, versuche stich zu bekommen
             else:
                 wahl = None
