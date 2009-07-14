@@ -138,6 +138,9 @@ def bedienen(spieler, tisch, possible):
         else:
             # TODO: wo sitzt Partner?
             # versuche stich zu bekommen
+            if possible[0].rank == ASS:
+                return possible[0]
+
             wahl = None
             for card in possible:
                 if card.isGreater(tisch.stich[0], tisch.trumpf):
@@ -255,7 +258,7 @@ def stechenSchmieren(spieler, tisch):
                             break
                     if wahl:
                         return wahl
-                # wenn keine truempfe, abwerfen
+                # wenn keine ausreichenden truempfe, abwerfen
                 wahl = None
                 for farbe in fehl(tisch.trumpf):
                     for card in own[farbe]:
@@ -266,7 +269,10 @@ def stechenSchmieren(spieler, tisch):
                         elif wahl.point == card.point:
                             if len(own[farbe]) == 1:
                                 wahl = card
-                return wahl
+                if wahl:
+                    return wahl
+                else:
+                    return own[tisch.trumpf][len(own[tisch.trumpf])-1]
         # sitzt in der mitte
         else:
             # TODO: wo sitzt Partner?
