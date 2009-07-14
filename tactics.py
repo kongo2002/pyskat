@@ -6,6 +6,9 @@ from pyskatrc import *
 def fehl(trumpf):
     return [x for x in [KARO, HERZ, PIK, KREUZ] if x != trumpf]
 
+def smallest(farbe):
+    return farbe[-1]
+
 def splitCards(cards, trumpf):
     dic = {}
     # fehl karten aufsplitten
@@ -24,6 +27,23 @@ def splitCards(cards, trumpf):
     clist.sort(reverse=True)
     dic[trumpf] = clist
     return dic
+
+def rateCards(spieler):
+    buben = 0
+    max_farbe = 0
+    max_fehlass = 0
+
+    # TODO: rating fuer farben stechen
+
+    for card in spieler.cards:
+        if card.rank == BUBE:
+            buben += 1
+        elif card.suit == spieler.getBestSuit():
+            max_farbe += 1
+        elif card.rank == ASS:
+            max_fehlass += 1
+
+    return buben*1.5+max_farbe+max_fehlass
 
 def aufspielen(spieler, tisch):
     # eigene karten 
@@ -106,7 +126,7 @@ def bedienen(spieler, tisch, possible):
                 return wahl
             # ansonsten den kleinsten
             else:
-                return possible[len(possible)-1]
+                return smallest(possible)
     # kontra
     else:
         # sitzt hinten
@@ -133,7 +153,7 @@ def bedienen(spieler, tisch, possible):
                     return wahl
                 # ansonsten den kleinsten
                 else:
-                    return possible[len(possible)-1]
+                    return smallest(possible)
         # sitzt in der mitte
         else:
             # TODO: wo sitzt Partner?
@@ -151,7 +171,7 @@ def bedienen(spieler, tisch, possible):
                 return wahl
             # ansonsten den kleinsten
             else:
-                return possible[len(possible)-1]
+                return smallest(possible)
 
 def stechenSchmieren(spieler, tisch):
     # eigene karten 
@@ -200,7 +220,7 @@ def stechenSchmieren(spieler, tisch):
             # TODO: AI
             # wenn wahl eine 10 oder ass, evtl doch kleinen trumpf
             if not wahl or wahl.rank == 10 or wahl.rank == ASS:
-                wahl = own[tisch.trumpf][len(own[tisch.trumpf])-1]
+                wahl = smallest(own[tisch.trumpf])
             return wahl
         # sitzt in der mitte
         else:
@@ -243,7 +263,11 @@ def stechenSchmieren(spieler, tisch):
                         elif wahl.point == card.point:
                             if len(own[farbe]) == 1:
                                 wahl = card
-                return wahl
+                if wahl:
+                    return wahl
+                # wenn kein fehl mehr, kleinen trumpf
+                else:
+                    return smallest(own[tisch.trumpf])
             # ansonsten, versuche stich zu bekommen
             else:
                 # wenn noch truempfe, dann stechen
@@ -272,7 +296,7 @@ def stechenSchmieren(spieler, tisch):
                 if wahl:
                     return wahl
                 else:
-                    return own[tisch.trumpf][len(own[tisch.trumpf])-1]
+                    return smallest(own[tisch.trumpf])
         # sitzt in der mitte
         else:
             # TODO: wo sitzt Partner?
@@ -295,21 +319,3 @@ def stechenSchmieren(spieler, tisch):
                             if len(own[farbe]) == 1:
                                 wahl = card
                 return wahl
-
-def rateCards(spieler):
-    buben = 0
-    max_farbe = 0
-    max_fehlass = 0
-
-    # TODO: rating fuer farben stechen
-
-    for card in spieler.cards:
-        if card.rank == BUBE:
-            buben += 1
-        elif card.suit == spieler.getBestSuit():
-            max_farbe += 1
-        elif card.rank == ASS:
-            max_fehlass += 1
-
-    return buben*1.5+max_farbe+max_fehlass
-
