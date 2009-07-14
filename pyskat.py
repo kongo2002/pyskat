@@ -359,9 +359,6 @@ class Player:
                     # TODO: intelligente kartenauswahl
                     return tactics.bedienen(self, tisch, possible_cards)
 
-        print "Tisch: ", tisch
-        return tisch
-
 class Tisch:
     
     def __init__(self):

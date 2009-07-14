@@ -219,3 +219,73 @@ def stechenSchmieren(spieler, tisch):
                             if len(own[farbe]) == 1:
                                 wahl = card
                 return wahl
+    # kontra
+    else:
+        # sitzt hinten
+        if len(tisch.stich) == 2:
+            # hoechste karte
+            if tisch.stich[0].isGreater(tisch.stich[1], tisch.trumpf):
+                highest = tisch.stich[0]
+            else:
+                highest = tisch.stich[1]
+            # partner hat den stich
+            if not highest.owner.re:
+                # TODO: AI
+                # mit hoechstem fehl schmieren
+                wahl = None
+                for farbe in fehl(tisch.trumpf):
+                    for card in own[farbe]:
+                        if not wahl or card.points > wahl.points:
+                            wahl = card
+                        elif wahl.points == card.points:
+                            if len(own[farbe]) == 1:
+                                wahl = card
+                return wahl
+            # ansonsten, versuche stich zu bekommen
+            else:
+                # wenn noch truempfe, dann stechen
+                if len(own[tisch.trumpf]) > 0:
+                    # TODO: AI
+                    # kleinst noetigsten trumpf spielen
+                    wahl = None
+                    for card in own[tisch.trumpf]:
+                        if card.isGreater(tisch.stich[0], tisch.trumpf):
+                            wahl = card
+                        else:
+                            break
+                    if wahl:
+                        return wahl
+                # wenn keine truempfe, abwerfen
+                wahl = None
+                for farbe in fehl(tisch.trumpf):
+                    for card in own[farbe]:
+                        # kleinsten fehl aufwaehlen
+                        if not wahl or wahl.points > card.points:
+                            wahl = card
+                        # wenn gleich, farbe stechen
+                        elif wahl.points == card.points:
+                            if len(own[farbe]) == 1:
+                                wahl = card
+                return wahl
+        # sitzt in der mitte
+        else:
+            # TODO: wo sitzt Partner?
+            #       kann der Partner stechen?
+            # wenn noch truempfe, dann stechen
+            if len(own[tisch.trumpf]) > 0:
+                # TODO: AI
+                # hoechsten trumpf spielen
+                return own[tisch.trumpf][0]
+            # wenn keine truempfe, abwerfen
+            else:
+                wahl = None
+                for farbe in fehl(tisch.trumpf):
+                    for card in own[farbe]:
+                        # kleinsten fehl aufwaehlen
+                        if not wahl or wahl.points > card.points:
+                            wahl = card
+                        # wenn gleich, farbe stechen
+                        elif wahl.points == card.points:
+                            if len(own[farbe]) == 1:
+                                wahl = card
+                return wahl
