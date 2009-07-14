@@ -323,13 +323,9 @@ class Player:
         # player = vorhand
         if len(tisch.stich) == 0:
             # TODO: intelligente kartenauswahl
-            # play random card
-            #i = random.randint(0, len(self.cards)-1)
-            #print "%s: %s" % (self.name, str(self.cards[i]))
-            #return self.cards[i]
             return tactics.aufspielen(self, tisch)
 
-        # bedienen
+        # player = mittelhand oder hinterhand
         else:
             possible_cards = []
 
@@ -361,9 +357,7 @@ class Player:
                     return possible_cards[0]
                 else:
                     # TODO: intelligente kartenauswahl
-                    #i = random.randint(0, len(possible_cards)-1)
                     return tactics.bedienen(self, tisch, possible_cards)
-                #print "%s: %s" % (self.name, str(possible_cards[i]))
 
         print "Tisch: ", tisch
         return tisch

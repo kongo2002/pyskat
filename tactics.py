@@ -149,3 +149,73 @@ def bedienen(spieler, tisch, possible):
             # ansonsten den kleinsten
             else:
                 return possible[len(possible)-1]
+
+def stechenSchmieren(spieler, tisch):
+    # eigene karten 
+    own = {}
+    own = splitCards(spieler.cards, tisch.trumpf)
+
+    # gespielte karten
+    played = {}
+    if len(tisch.playedStiche) > 0:
+        clist = []
+        for stiche in tisch.playedStiche:
+            clist.extend(stiche)
+        played = splitCards(clist, tisch.trumpf)
+
+    # spielmacher
+    if spieler.re:
+        # sitzt hinten
+        if len(tisch.stich) == 2:
+            # hoechste karte
+            if tisch.stich[0].isGreater(tisch.stich[1], tisch.trumpf):
+                highest = tisch.stich[0]
+            else:
+                highest = tisch.stich[1]
+            # nicht nur luschen?
+            if (tisch.stich[0].points + tisch.stich[1].points) >= 3:
+                # versuche drueber zu kommen
+                wahl = None
+                for card in own[tisch.trumpf]:
+                    if card.isGreater(highest, tisch.trumpf):
+                        wahl = card
+                    else:
+                        break
+                if wahl:
+                    return wahl
+            # abwerfen, wenn nur luschen oder nicht drueber kommt
+            wahl = None
+            for farbe in fehl(tisch.trumpf):
+                for card in own[farbe]:
+                    # kleinsten fehl aufwaehlen
+                    if not wahl or wahl.points > card.points:
+                        wahl = card
+                    # wenn gleich, farbe stechen
+                    elif wahl.points == card.points:
+                        if len(own[farbe]) == 1:
+                            wahl = card
+            # TODO: AI
+            # wenn wahl eine 10 oder ass, evtl doch kleinen trumpf
+            if not wahl or wahl.rank == 10 or wahl.rank == ASS:
+                wahl = own[tisch.trumpf][len(own[tisch.trumpf])-1]
+            return wahl
+        # sitzt in der mitte
+        else:
+            # wenn noch truempfe, dann stechen
+            if len(own[tisch.trumpf]) > 0:
+                # TODO: AI
+                # hoechsten trumpf spielen
+                return own[tisch.trumpf][0]
+            # wenn keine truempfe, abwerfen
+            else:
+                wahl = None
+                for farbe in fehl(tisch.trumpf):
+                    for card in own[farbe]:
+                        # kleinsten fehl aufwaehlen
+                        if not wahl or wahl.points > card.points:
+                            wahl = card
+                        # wenn gleich, farbe stechen
+                        elif wahl.points == card.points:
+                            if len(own[farbe]) == 1:
+                                wahl = card
+                return wahl
