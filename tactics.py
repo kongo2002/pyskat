@@ -59,6 +59,38 @@ def isHighest(card, played_cards):
     else:
         return False
 
+def hatGestochen(spieler, tisch, farbe):
+    if farbe != tisch.trumpf:
+        for stich in tisch.stiche:
+            if (stich[0].suit == farbe and stich[0].owner != spieler and
+                    stich[0].rank != BUBE):
+                if stich[1].owner == spieler:
+                    if stich[1].suit != farbe or stich[1].rank == BUBE:
+                        return True
+                    else:
+                        continue
+                else:
+                    if stich[2].suit != farbe or stich[2].rank == BUBE:
+                        return True
+                    else:
+                        continue
+    else:
+        for stich in tisch.stiche:
+            if ((stich[0].suit == farbe or stich[0].rank == BUBE) and
+                    stich[0].owner != spieler):
+                if stich[1].owner == spieler:
+                    if stich[1].suit != farbe and stich[1].rank != BUBE:
+                        return True
+                    else:
+                        continue
+                else:
+                    if stich[2].suit != farbe and stich[2].rank != BUBE:
+                        return True
+                    else:
+                        continue
+
+    return False
+
 def rateCards(spieler):
     buben = 0
     max_farbe = 0
