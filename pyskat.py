@@ -206,10 +206,15 @@ class Player:
 
     def reizen(self):
         max = REIZEN[self.getBestSuit()]*self.getMaxReizwert() 
+        rating = tactics.rateCards(self)
 
-        print "%s: kann bis %d reizen (Rating=%d)" % (self.name, max,
-                tactics.rateCards(self))
-        return max
+        print "%s: kann bis %d reizen (Rating=%d)" % (self.name, max, rating)
+
+        # nur reizen, wenn gutes blatt
+        if rating >= 6:
+            return max
+        else:
+            return 0
 
     def doSagen(self, hoerer):
         # TODO: KI
@@ -289,6 +294,7 @@ class Player:
                         del farbe[0]
                         break
             # rest auswaehlen
+            # TODO: kein ass auswaehlen
             for i in range(2-len(skat)):
                 j = 0
                 for k in range(len(classes)):

@@ -31,12 +31,34 @@ def splitCards(cards, trumpf):
     dic[trumpf] = clist
     return dic
 
+def isHighest(card, played_cards):
+    ref = [card.suit+x for x in [ASS,10,KOENIG,DAME,9,8,7]]
+
+    for pcard in played_cards[card.suit]:
+        for ref_card in ref:
+            if pcard == ref_card:
+                del ref_card
+                break
+
+    if len(ref) == 0:
+        return True
+    elif card > ref[0]:
+        return True
+    else:
+        return False
+
 def rateCards(spieler):
     buben = 0
     max_farbe = 0
     max_fehlass = 0
+    farben_stechen = 0
 
-    # TODO: rating fuer farben stechen
+    own = {}
+    own = splitCards(spieler.cards, 100)
+
+    for farbe in own:
+        if len(own[farbe]) == 0:
+            farben_stechen += 1
 
     for card in spieler.cards:
         if card.rank == BUBE:
@@ -46,7 +68,7 @@ def rateCards(spieler):
         elif card.rank == ASS:
             max_fehlass += 1
 
-    return buben*1.5+max_farbe+max_fehlass
+    return buben*1.5+max_farbe+max_fehlass+farben_stechen
 
 def aufspielen(spieler, tisch):
     # eigene karten 
@@ -73,26 +95,47 @@ def aufspielen(spieler, tisch):
             if not ace:
                 ace = card
             # wenn mehrere, dann die kuerzeste farbe
-            else:
-                # TODO
-                pass
+            elif len(own[card.suit]) == 1:
+                ace = card
+            elif len(played[card.suit]) < len(played[ace.suit]):
+                ace = card
     if ace:
         return ace
 
+    # 10 spielen, wenn ass schon raus
+    ten = None
+    for farbe in fehl(tisch.trumpf):
+        if own[farbe][0] == 10:
+            if isHighest(own[farbe][0]), played):
+                # wenn mehrere, dann kuerzeste
+                if not ten or len(played[farbe]) < len(played[ten.suit]):
+                    ten = own[farbe][0]
+    if ten:
+        return ten
+
+    # spielmacher
+    if spieler.re:
+        # hohen trumpf spielen
+        # TODO: gespielte truempfe einberechnen
+        if len(own[tisch.trumpf]) > 0:
+            return biggest(own[tisch.trumpf])
+
     # kurzen fehl spielen
-    count = 12
     wahl = 0
     for farbe in fehl(tisch.trumpf):
-        if len(own[farbe]) < count and len(own[farbe]) != 0:
+        if not wahl or (len(own[farbe]) < len(own[wahl]) and
+                len(own[farbe]) != 0):
             wahl = farbe
     # TODO: 10 spielen, wenn ass schon raus
     #       stechen/schmieren kalkulieren
     if wahl:
-        return biggest(own[wahl])
+        if isHighest(biggest(own[wahl])):
+            return biggest(own[wahl])
+        else:
+            return smallest(own[wahl)
 
-    # hohen trumpf spielen
-    # TODO: gespielte truempfe einberechnen
     return biggest(own[tisch.trumpf])
+
 
 def bedienen(spieler, tisch, possible):
     # spielmacher
