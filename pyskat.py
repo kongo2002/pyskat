@@ -329,6 +329,8 @@ class Player:
 
         # player = vorhand
         if len(tisch.stich) == 0:
+            print self.cards
+
             # TODO: intelligente kartenauswahl
             return tactics.aufspielen(self, tisch)
 
@@ -349,14 +351,17 @@ class Player:
                         possible_cards.append(j)
 
             possible_cards.sort(reverse=True)
-            print possible_cards
 
             # stechen/schmieren
             if len(possible_cards) == 0:
+                print self.cards
+
                 # TODO: intelligente kartenauswahl
                 return tactics.stechenSchmieren(self, tisch)
             # bedienen
             else:
+                print possible_cards
+
                 if len(possible_cards) == 1:
                     return possible_cards[0]
                 else:
