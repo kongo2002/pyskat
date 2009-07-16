@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last Change: Jul 14, 2009
+# Last Change: Jul 16, 2009
 
 from pyskatrc import *
 import tactics
@@ -617,7 +617,7 @@ def main():
 
     skat.listPlayers()
 
-    for i in range(2):
+    for i in range(10):
         skat.nextRound()
 
 if __name__ == '__main__':
