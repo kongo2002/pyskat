@@ -528,7 +528,7 @@ class pyskat:
         print 70 * '-'
 
         if not self.tisch.reizen(self.vorhand):
-            self.nextRound(self)
+            self.nextRound()
 
         self.showSkat()
 
