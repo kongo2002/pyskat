@@ -97,7 +97,26 @@ def hatGestochen(spieler, tisch, farbe):
                         return True
                     else:
                         continue
+    return False
 
+def hatAbgeworfen(spieler, tisch, farbe):
+    # trumpf wird nicht abgeworfen
+    if farbe == tisch.trumpf:
+        return False
+
+    for stich in tisch.playedStiche:
+        if stich[0].owner != spieler and (stich[0].suit != farbe or
+                stich[0].rank == BUBE):
+            if stich[1].owner == spieler:
+                if stich[1].suit == farbe and stich[1].rank != BUBE:
+                    return True
+                else:
+                    continue
+            else:
+                if stich[2].suit == farbe and stich[2].rank != BUBE:
+                    return True
+                else:
+                    continue
     return False
 
 def rateCards(spieler):
@@ -285,11 +304,10 @@ def bedienen(spieler, tisch, possible):
                     return smallest(possible)
             # spielmacher sitzt hinten
             else:
-                # spielmacher hat farbe schon gestochen
-                if hatGestochen(hinterhand(tisch), tisch, tisch.stich[0].suit):
-                    # kleinsten
+                # spielmacher hat farbe gestochen oder abgeworfen
+                if (hatGestochen(hinterhand(tisch), tisch, tisch.stich[0].suit) or
+                        hatAbgeworfen(hinterhand(tisch), tisch, tisch.stich[0].suit)):
                     return smallest(possible)
-                # TODO: hat farbe schon abgeworfen?
                 else:
                     return biggest(possible)
 

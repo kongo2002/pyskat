@@ -321,7 +321,7 @@ class Player:
 
     def spielAnsagen(self):
         # TODO: nullspiel und grandspiel
-        #       KI
+        #       beachte gereizten wert
         return self.getBestSuit()
 
     def playStich(self, tisch):
