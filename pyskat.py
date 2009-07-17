@@ -599,6 +599,8 @@ class pyskat:
                 print "%s: - %d Punkte" % (player.name, spielwert)
         # ueberreizt
         else:
+            print "%s hat %d zu %d Punkte bekommen" % (player.name,
+                    re_pts, kontra_pts)
             print "Spiel (%d) ueberreizt - verloren!" % spielwert
             spielwert = player.gereizt * 2
             player.gesamt -= spielwert
