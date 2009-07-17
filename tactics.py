@@ -68,6 +68,12 @@ def isHighest(card, played_cards):
     else:
         return False
 
+def isTrumpf(card, tisch):
+    if card.suit == tisch.trumpf or card.rank == BUBE:
+        return True
+    else:
+        return False
+
 def hatGestochen(spieler, tisch, farbe):
     if farbe != tisch.trumpf:
         for stich in tisch.playedStiche:
@@ -265,7 +271,11 @@ def bedienen(spieler, tisch, possible):
             if not highest.owner.re:
                 # wenn erster stich der farbe, hoechsten (darunter)
                 if len(played[tisch.stich[0].suit]) == 0:
-                    return biggest(possible)
+                    # nur bei fehl
+                    if not isTrumpf(tisch.stich[0], tisch):
+                        return biggest(possible)
+                    else:
+                        return smallest(possible)
                 # ansonsten kleinsten nehmen
                 else:
                     return smallest(possible)
