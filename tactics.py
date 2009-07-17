@@ -274,11 +274,8 @@ def bedienen(spieler, tisch, possible):
                     # nur bei fehl
                     if not isTrumpf(tisch.stich[0], tisch):
                         return biggest(possible)
-                    else:
-                        return smallest(possible)
                 # ansonsten kleinsten nehmen
-                else:
-                    return smallest(possible)
+                return smallest(possible)
             # ansonsten, versuche stich zu bekommen
             else:
                 wahl = None
