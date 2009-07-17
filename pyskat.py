@@ -527,8 +527,18 @@ class pyskat:
         print "Hinterhand: %s" % self.tisch.players[(self.vorhand+2)%3]
         print 70 * '-'
 
+        # alle spieler passen
         if not self.tisch.reizen(self.vorhand):
-            self.nextRound()
+            for card in self.tisch.skat:
+                self.deck.cards.append(card)
+            del self.tisch.skat[:]
+
+            for stich in self.tisch.playedStiche:
+                self.deck.cards.extend(stich)
+            del self.tisch.playedStiche[:]
+
+            self.vorhand = (self.vorhand + 1) % 3
+            return self.nextRound()
 
         self.showSkat()
 
