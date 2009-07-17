@@ -325,8 +325,6 @@ class Player:
         return self.getBestSuit()
 
     def playStich(self, tisch):
-        print "%s denkt nach..." % self.name
-
         # player = vorhand
         if len(tisch.stich) == 0:
             print self.cards
@@ -480,6 +478,7 @@ class pyskat:
     def __init__(self):
         self.deck = Deck()
         self.tisch = Tisch()
+        self.vorhand = 0
         self.round = 0
 
     def addPlayer(self, name):
@@ -508,7 +507,6 @@ class pyskat:
 
     def nextRound(self):
         self.round += 1
-        self.tisch.vorhand = (self.tisch.vorhand + 1) % 3
 
         self.deck.shuffle()
         self.tisch.giveCards(self.deck.cards)
@@ -519,12 +517,12 @@ class pyskat:
         for player in self.tisch.players:
             player.reizen()
     
-        print "Vorhand:    %s" % self.tisch.players[self.tisch.vorhand]
-        print "Mittelhand: %s" % self.tisch.players[(self.tisch.vorhand+1)%3]
-        print "Hinterhand: %s" % self.tisch.players[(self.tisch.vorhand+2)%3]
+        print "Vorhand:    %s" % self.tisch.players[self.vorhand]
+        print "Mittelhand: %s" % self.tisch.players[(self.vorhand+1)%3]
+        print "Hinterhand: %s" % self.tisch.players[(self.vorhand+2)%3]
         print 70 * '-'
 
-        self.tisch.reizen(self.tisch.vorhand)
+        self.tisch.reizen(self.vorhand)
 
         self.showSkat()
         self.printPlayerCards()
@@ -533,6 +531,8 @@ class pyskat:
             self.tisch.nextStich()
 
         self.roundSummary(self.tisch.spielmacher)
+
+        self.vorhand = (self.vorhand + 1) % 3
 
     def roundSummary(self, player):
         re_pts = player.points
