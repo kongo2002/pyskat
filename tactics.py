@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last Change: Jul 16, 2009
+# Last Change: Jul 17, 2009
 
 from pyskatrc import *
 
@@ -11,6 +11,15 @@ def smallest(farbe):
 
 def biggest(farbe):
     return farbe[0]
+
+def vorhand(tisch):
+    return tisch.players[tisch.vorhand]
+
+def mittelhand(tisch):
+    return tisch.players[(tisch.vorhand+1)%3]
+
+def hinterhand(tisch):
+    return tisch.players[(tisch.vorhand+2)%3]
 
 def splitCards(cards, trumpf):
     dic = {}
@@ -61,7 +70,7 @@ def isHighest(card, played_cards):
 
 def hatGestochen(spieler, tisch, farbe):
     if farbe != tisch.trumpf:
-        for stich in tisch.stiche:
+        for stich in tisch.playedStiche:
             if (stich[0].suit == farbe and stich[0].owner != spieler and
                     stich[0].rank != BUBE):
                 if stich[1].owner == spieler:
@@ -75,7 +84,7 @@ def hatGestochen(spieler, tisch, farbe):
                     else:
                         continue
     else:
-        for stich in tisch.stiche:
+        for stich in tisch.playedStiche:
             if ((stich[0].suit == farbe or stich[0].rank == BUBE) and
                     stich[0].owner != spieler):
                 if stich[1].owner == spieler:
@@ -115,7 +124,7 @@ def rateCards(spieler):
     return buben*1.5+max_farbe+max_fehlass+farben_stechen
 
 def aufspielen(spieler, tisch):
-    # eigene karten 
+    # eigene karten
     own = {}
     own = splitCards(spieler.cards, tisch.trumpf)
 
@@ -182,6 +191,13 @@ def aufspielen(spieler, tisch):
 
 
 def bedienen(spieler, tisch, possible):
+    # gespielte karten
+    played = {}
+    clist = []
+    for stiche in tisch.playedStiche:
+        clist.extend(stiche)
+    played = splitCards(clist, tisch.trumpf)
+
     # spielmacher
     if spieler.re:
         # sitzt hinten
@@ -228,9 +244,12 @@ def bedienen(spieler, tisch, possible):
                 highest = tisch.stich[1]
             # partner hat den stich
             if not highest.owner.re:
-                # kleinsten nehmen
-                # TODO: AI
-                return smallest(possible)
+                # wenn erster stich der farbe, hoechsten (darunter)
+                if len(played[tisch.stich[0].suit]) == 0:
+                    return biggest(possible)
+                # ansonsten kleinsten nehmen
+                else:
+                    return smallest(possible)
             # ansonsten, versuche stich zu bekommen
             else:
                 wahl = None
@@ -246,22 +265,33 @@ def bedienen(spieler, tisch, possible):
                     return smallest(possible)
         # sitzt in der mitte
         else:
-            # TODO: wo sitzt Partner?
-            # versuche stich zu bekommen
+            # ass spielen
             if possible[0].rank == ASS:
                 return possible[0]
 
-            wahl = None
-            for card in possible:
-                if card.isGreater(tisch.stich[0], tisch.trumpf):
-                    wahl = card
+            # partner sitzt hinten
+            if tisch.stich[0].owner.re:
+                # versuche drueber zu kommen
+                wahl = None
+                for card in possible:
+                    if card.isGreater(tisch.stich[0], tisch.trumpf):
+                        wahl = card
+                    else:
+                        break
+                if wahl:
+                    return wahl
+                # ansonsten den kleinsten
                 else:
-                    break
-            if wahl:
-                return wahl
-            # ansonsten den kleinsten
+                    return smallest(possible)
+            # spielmacher sitzt hinten
             else:
-                return smallest(possible)
+                # spielmacher hat farbe schon gestochen
+                if hatGestochen(hinterhand(tisch), tisch, tisch.stich[0].suit):
+                    # kleinsten
+                    return smallest(possible)
+                # TODO: hat farbe schon abgeworfen?
+                else:
+                    return biggest(possible)
 
 def stechenSchmieren(spieler, tisch):
     # eigene karten 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last Change: Jul 16, 2009
+# Last Change: Jul 17, 2009
 
 from pyskatrc import *
 import tactics
