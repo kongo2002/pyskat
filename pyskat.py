@@ -420,16 +420,21 @@ class Tisch:
         self.spielmacher = self.spielmacher.doSagen(self.players[(vorhand+2)%3])
 
         if self.spielmacher.gereizt == 0:
-            # TODO: alle passen -> ramsch
-            pass
-        else:
-            print "%s gewinnt das Reizen mit %d Punkten" % (self.spielmacher.name,
-                    self.spielmacher.gereizt)
+            # pruefen ob hinterhand auch passen will
+            if not self.spielmacher.doHoeren(18):
+                # TODO: alle passen -> ramsch
+                print "Alle Spieler passen. Neue Runde!"
+                return False
 
-            self.handspiel = self.spielmacher.takeSkat(self.skat)
-            self.spielmacher.re = True
+        print "%s gewinnt das Reizen mit %d Punkten" % (self.spielmacher.name,
+                self.spielmacher.gereizt)
+
+        self.handspiel = self.spielmacher.takeSkat(self.skat)
+        self.spielmacher.re = True
 
         self.trumpf = self.spielmacher.spielAnsagen()
+
+        return True
 
     def nextStich(self):
         print "*** Stich %d ***" % (len(self.playedStiche)+1)
@@ -522,10 +527,10 @@ class pyskat:
         print "Hinterhand: %s" % self.tisch.players[(self.vorhand+2)%3]
         print 70 * '-'
 
-        self.tisch.reizen(self.vorhand)
+        if not self.tisch.reizen(self.vorhand):
+            self.nextRound(self)
 
         self.showSkat()
-        self.printPlayerCards()
 
         for i in range(10):
             self.tisch.nextStich()
