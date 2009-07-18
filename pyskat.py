@@ -533,9 +533,9 @@ class pyskat:
                 self.deck.cards.append(card)
             del self.tisch.skat[:]
 
-            for stich in self.tisch.playedStiche:
-                self.deck.cards.extend(stich)
-            del self.tisch.playedStiche[:]
+            for player in self.tisch.players:
+                self.deck.cards.extend(player.cards)
+                del player.cards[:]
 
             self.vorhand = (self.vorhand + 1) % 3
             return self.nextRound()
