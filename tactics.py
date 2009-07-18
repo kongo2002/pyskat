@@ -428,7 +428,7 @@ def stechenSchmieren(spieler, tisch):
                             elif wahl.point == card.point:
                                 if len(own[farbe]) == 1:
                                     wahl = card
-                if wahl: return wahl
+                    if wahl: return wahl
                 # wenn noch truempfe, dann stechen
                 if len(own[tisch.trumpf]) > 0:
                     # TODO: AI
