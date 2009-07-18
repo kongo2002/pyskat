@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last Change: Jul 17, 2009
+# Last Change: Jul 18, 2009
 
 from pyskatrc import *
 
@@ -355,7 +355,7 @@ def stechenSchmieren(spieler, tisch):
             wahl = None
             for farbe in fehl(tisch.trumpf):
                 for card in own[farbe]:
-                    # kleinsten fehl aufwaehlen
+                    # kleinsten fehl auswaehlen
                     if not wahl or wahl.point > card.point:
                         wahl = card
                     # wenn gleich, farbe stechen
@@ -416,6 +416,19 @@ def stechenSchmieren(spieler, tisch):
                     return smallest(own[tisch.trumpf])
             # ansonsten, versuche stich zu bekommen
             else:
+                # wenn nur luschen, abwerfen
+                if (tisch.stich[0].point + tisch.stich[1].point) < 3:
+                    wahl = None
+                    for farbe in fehl(tisch.trumpf):
+                        for card in own[farbe]:
+                            # kleinsten fehl auswaehlen
+                            if not wahl or wahl.point > card.point:
+                                wahl = card
+                            # wenn gleich, farbe stechen
+                            elif wahl.point == card.point:
+                                if len(own[farbe]) == 1:
+                                    wahl = card
+                if wahl: return wahl
                 # wenn noch truempfe, dann stechen
                 if len(own[tisch.trumpf]) > 0:
                     # TODO: AI
