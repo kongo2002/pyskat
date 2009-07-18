@@ -325,11 +325,10 @@ def stechenSchmieren(spieler, tisch):
 
     # gespielte karten
     played = {}
-    if len(tisch.playedStiche) > 0:
-        clist = []
-        for stiche in tisch.playedStiche:
-            clist.extend(stiche)
-        played = splitCards(clist, tisch.trumpf)
+    clist = []
+    for stiche in tisch.playedStiche:
+        clist.extend(stiche)
+    played = splitCards(clist, tisch.trumpf)
 
     # spielmacher
     if spieler.re:
@@ -460,6 +459,25 @@ def stechenSchmieren(spieler, tisch):
         else:
             # TODO: wo sitzt Partner?
             #       kann der Partner stechen?
+            # wenn erster stich der farbe
+            if len(played[tisch.stich[0].suit]) == 0:
+                # wenn partner hinten und ass noch draussen
+                if tisch.stich[0].owner.re and tisch.stich[0].rank != ASS:
+                    # hohen fehl schmieren
+                    wahl = None
+                    for farbe in fehl(tisch.trumpf):
+                        for card in own[farbe]:
+                            if not wahl or (wahl.point < card.point and
+                                    card.rank != ASS):
+                                wahl = card
+                            # wenn gleich, farbe stechen
+                            elif wahl.point == card.point:
+                                if len(own[farbe]) == 1:
+                                    wahl = card
+                    if wahl: return wahl
+                # ansonsten kleinen trumpf spielen
+                if len(own[tisch.trumpf]) > 0:
+                    return smallest(own[tisch.trumpf])
             # wenn noch truempfe, dann stechen
             if len(own[tisch.trumpf]) > 0:
                 # TODO: AI
