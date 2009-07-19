@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last Change: Jul 18, 2009
+# Last Change: Jul 19, 2009
 
 from pyskatrc import *
 
@@ -180,23 +180,33 @@ def aufspielen(spieler, tisch):
         return ace
 
     # 10 spielen, wenn ass schon raus
-    ten = None
-    for farbe in fehl(tisch.trumpf):
-        if len(own[farbe]) > 0:
-            if own[farbe][0].rank == 10:
-                if isHighest(own[farbe][0], played):
-                    # wenn mehrere, dann kuerzeste
-                    if not ten or len(played[farbe]) < len(played[ten.suit]):
-                        ten = own[farbe][0]
-    if ten:
-        return ten
+    # und wenn truempfe raus
+    if (len(played[tisch.trumpf])+len(own[tisch.trumpf]) == 11):
+        ten = None
+        for farbe in fehl(tisch.trumpf):
+            if len(own[farbe]) > 0:
+                if own[farbe][0].rank == 10:
+                    if isHighest(own[farbe][0], played):
+                        # wenn mehrere, dann kuerzeste
+                        if not ten or len(played[farbe]) < len(played[ten.suit]):
+                            ten = own[farbe][0]
+        if ten:
+            return ten
 
     # spielmacher
     if spieler.re:
-        # hohen trumpf spielen
-        # TODO: gespielte truempfe einberechnen
+        # truempfe ziehen
         if len(own[tisch.trumpf]) > 0:
-            return biggest(own[tisch.trumpf])
+            wahl = None
+            # groessten spielen, wenn hoechster trumpf
+            if isHighest(biggest(own[tisch.trumpf]), played):
+                return biggest(own[tisch.trumpf])
+            # sonst kleinen
+            else:
+                for card in own[tisch.trumpf]:
+                    if not wahl or card.points < 10:
+                        wahl = card
+                return wahl
 
     # kurzen fehl spielen
     wahl = None
@@ -204,8 +214,7 @@ def aufspielen(spieler, tisch):
         if ((not wahl or len(own[farbe]) < len(own[wahl])) and
                 len(own[farbe]) > 0):
             wahl = farbe
-    # TODO: 10 spielen, wenn ass schon raus
-    #       stechen/schmieren kalkulieren
+    # TODO: stechen/schmieren kalkulieren
     if wahl:
         if isHighest(biggest(own[wahl]), played):
             return biggest(own[wahl])
