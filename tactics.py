@@ -67,16 +67,11 @@ def isHighest(card, played_cards, trumpf):
             del ref[index]
             break
 
-    print "refcards: ", ref
-
     if len(ref) == 0:
-        print card, " is highest"
         return True
     elif card.isGreater(ref[0], trumpf):
-        print card, " is highest"
         return True
     else:
-        print card, " is not highest"
         return False
 
 def isTrumpf(card, tisch):
@@ -268,6 +263,10 @@ def bedienen(spieler, tisch, possible):
                 return smallest(possible)
         # sitzt in der mitte
         else:
+            # wenn ass, dann rein damit :-)
+            if possible[0].rank == ASS and possible[0].suit != tisch.trumpf:
+                if len(played[possible[0].suit]) == 0:
+                    return possible[0]
             # versuche stich zu bekommen
             wahl = None
             for card in possible:
@@ -393,7 +392,9 @@ def stechenSchmieren(spieler, tisch):
         else:
             # wenn noch truempfe, dann stechen
             if len(own[tisch.trumpf]) > 0:
-                # TODO: AI
+                # wenn erster stich der farbe, kleiner trumpf
+                if len(played[tisch.stich[0].suit]) == 0:
+                    return smallest(own[tisch.trumpf])
                 # hoechsten trumpf spielen
                 return own[tisch.trumpf][0]
             # wenn keine truempfe, abwerfen
