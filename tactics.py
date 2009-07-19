@@ -40,32 +40,43 @@ def splitCards(cards, trumpf):
     dic[trumpf] = clist
     return dic
 
-def isHighest(card, played_cards):
-    ref = [card.suit+x for x in [ASS,10,KOENIG,DAME,9,8,7]]
+def isHighest(card, played_cards, trumpf):
+    if card.rank == BUBE:
+        farbe = trumpf
+    else:
+        farbe = card.suit
+
+    ref = [Card(farbe+x) for x in [ASS,10,KOENIG,DAME,9,8,7]]
+
+    if card.suit == trumpf or card.rank == BUBE:
+        for i in [100, 80, 60, 40]:
+            ref.append(Card(i+BUBE))
+
+    ref.sort(reverse=True)
 
     # gespielte karten entfernen
-    for pcard in played_cards[card.suit]:
-        for ref_card in ref:
-            if (pcard.rank+pcard.suit) == ref_card:
-                del ref_card
+    for pcard in played_cards[farbe]:
+        for index, ref_card in enumerate(ref):
+            if pcard == ref_card:
+                del ref[index]
                 break
 
     # zu spielende karte entfernen
-    for ref_card in ref:
-        if (card.rank+card.suit) == ref_card:
-            del ref_card
+    for index, ref_card in enumerate(ref):
+        if card == ref_card:
+            del ref[index]
             break
 
+    print "refcards: ", ref
+
     if len(ref) == 0:
+        print card, " is highest"
         return True
-    elif POINTS[card.rank] > POINTS[ref[0]%20]:
+    elif card.isGreater(ref[0], trumpf):
+        print card, " is highest"
         return True
-    elif POINTS[card.rank] == POINTS[ref[0]%20]:
-        if card.rank > (ref[0] - ref[0]%20):
-            return True
-        else:
-            return False
     else:
+        print card, " is not highest"
         return False
 
 def isTrumpf(card, tisch):
@@ -166,6 +177,8 @@ def aufspielen(spieler, tisch):
         print "%s (Kontra) kommt raus" % spieler.name
 
     # ass spielen, wenn kein trumpf
+    # TODO: nur spielen, wenn moeglich dass durchgeht 
+    #       oder keine truempfe mehr drin
     ace = None
     for card in spieler.cards:
         if card.rank == ASS and card.suit != tisch.trumpf:
@@ -186,7 +199,7 @@ def aufspielen(spieler, tisch):
         for farbe in fehl(tisch.trumpf):
             if len(own[farbe]) > 0:
                 if own[farbe][0].rank == 10:
-                    if isHighest(own[farbe][0], played):
+                    if isHighest(own[farbe][0], played, tisch.trumpf):
                         # wenn mehrere, dann kuerzeste
                         if not ten or len(played[farbe]) < len(played[ten.suit]):
                             ten = own[farbe][0]
@@ -199,12 +212,12 @@ def aufspielen(spieler, tisch):
         if len(own[tisch.trumpf]) > 0:
             wahl = None
             # groessten spielen, wenn hoechster trumpf
-            if isHighest(biggest(own[tisch.trumpf]), played):
+            if isHighest(biggest(own[tisch.trumpf]), played, tisch.trumpf):
                 return biggest(own[tisch.trumpf])
             # sonst kleinen
             else:
                 for card in own[tisch.trumpf]:
-                    if not wahl or card.points < 10:
+                    if not wahl or card.point < 10:
                         wahl = card
                 return wahl
 
@@ -216,7 +229,7 @@ def aufspielen(spieler, tisch):
             wahl = farbe
     # TODO: stechen/schmieren kalkulieren
     if wahl:
-        if isHighest(biggest(own[wahl]), played):
+        if isHighest(biggest(own[wahl]), played, tisch.trumpf):
             return biggest(own[wahl])
         else:
             return smallest(own[wahl])
