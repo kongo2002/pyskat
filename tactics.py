@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last Change: Jul 19, 2009
+# Last Change: Jul 20, 2009
 
 from pyskatrc import *
 
@@ -11,6 +11,16 @@ def smallest(farbe):
 
 def biggest(farbe):
     return farbe[0]
+
+def lessest(cards):
+    if smallest(cards).point == 0:
+        return smallest(cards)
+    else:
+        wahl = None
+        for card in cards:
+            if not wahl or wahl.point >= card.point:
+                wahl = card
+        return wahl
 
 def vorhand(tisch):
     return tisch.players[tisch.vorhand]
@@ -260,7 +270,10 @@ def bedienen(spieler, tisch, possible):
                 return wahl
             # ansonsten den kleinsten
             else:
-                return smallest(possible)
+                wahl = smallest(possible)
+                if wahl.rank == ASS or wahl.rank == 10:
+                    wahl = lessest(possible)
+                return wahl
         # sitzt in der mitte
         else:
             # wenn ass, dann rein damit :-)
@@ -278,7 +291,10 @@ def bedienen(spieler, tisch, possible):
                 return wahl
             # ansonsten den kleinsten
             else:
-                return smallest(possible)
+                wahl = smallest(possible)
+                if wahl.rank == ASS or wahl.rank == 10:
+                    wahl = lessest(possible)
+                return wahl
     # kontra
     else:
         # sitzt hinten
