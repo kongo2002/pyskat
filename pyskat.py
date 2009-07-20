@@ -199,7 +199,9 @@ class Player:
                     if len(classes[k]) > 0:
                         if (len(classes[k]) < len(classes[j]) or
                                 len(classes[j]) == 0):
-                            j = k
+                            if not (len(classes[k]) == 1 and
+                                    classes[k][0].rank == ASS):
+                                j = k
                 classes[j].sort()
                 # 10 in den skat, wenn kein ass
                 if len(classes[j]) == 2 and classes[j][-1].rank == 10:

@@ -235,9 +235,11 @@ def aufspielen(spieler, tisch):
     # TODO: stechen/schmieren kalkulieren
     if wahl:
         if isHighest(biggest(own[wahl]), played, tisch.trumpf):
-            return biggest(own[wahl])
-        else:
-            return smallest(own[wahl])
+            # 10 nur spielen wenn truempfe weg
+            if not (biggest(own[wahl]).rank == 10 and
+                    (len(played[tisch.trumpf])+len(own[tisch.trumpf]) < 11)):
+                return biggest(own[wahl])
+        return smallest(own[wahl])
 
     return biggest(own[tisch.trumpf])
 
