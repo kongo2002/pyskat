@@ -260,6 +260,9 @@ def bedienen(spieler, tisch, possible):
             else:
                 highest = tisch.stich[1]
             # versuche drueber zu kommen
+            if possible[0].rank == ASS:
+                return possible[0]
+
             wahl = None
             for card in possible:
                 if card.isGreater(highest, tisch.trumpf):
@@ -315,6 +318,10 @@ def bedienen(spieler, tisch, possible):
                 return smallest(possible)
             # ansonsten, versuche stich zu bekommen
             else:
+                # ass spielen
+                if possible[0].rank == ASS:
+                    return possible[0]
+
                 wahl = None
                 for card in possible:
                     if card.isGreater(highest, tisch.trumpf):
