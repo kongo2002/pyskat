@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last Change: Jul 19, 2009
+# Last Change: Jul 20, 2009
 
 from pyskatrc import *
 import tactics
@@ -201,8 +201,13 @@ class Player:
                                 len(classes[j]) == 0):
                             j = k
                 classes[j].sort()
-                skat.append(classes[j][0])
-                del classes[j][0]
+                # 10 in den skat, wenn kein ass
+                if len(classes[j]) == 2 and classes[j][-1].rank == 10:
+                    skat.append(classes[j][-1])
+                    del classes[j][-1]
+                else:
+                    skat.append(classes[j][0])
+                    del classes[j][0]
 
         # ausgewaehlte karten entfernen
         for card in skat:
