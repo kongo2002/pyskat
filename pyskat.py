@@ -4,6 +4,7 @@
 from pyskatrc import *
 import tactics
 import random
+import gtk
 import sys
 
 class Deck:
@@ -41,6 +42,10 @@ class Player:
         self.cards = []
         self.gereizt = 0
         self.re = False
+        if pos == 0:
+            self.human = True
+        else:
+            self.human = False
 
     def __repr__(self):
         return str(self)
@@ -383,9 +388,25 @@ class Tisch:
             if winner == self.players[x]:
                 return x
 
-class pyskat:
+class pyskat(gtk.Window):
 
     def __init__(self):
+        super(pyskat, self).__init__()
+
+        self.set_title('pyskat')
+        self.set_size_request(800, 600)
+        self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(6400, 6400, 6440))
+        self.set_position(gtk.WIN_POS_CENTER)
+
+        self.fix = gtk.Fixed()
+        self.startb = gtk.Button('Naechste Runde')
+        self.startb.set_size_request(150, 30)
+        self.fix.put(self.startb, 325, 275)
+        self.startb.connect('button_press_event', self._nextRound, None)
+        self.add(self.fix)
+        self.connect('destroy', gtk.main_quit)
+        self.show_all()
+
         self.deck = Deck()
         self.tisch = Tisch()
         self.vorhand = 0
@@ -414,6 +435,10 @@ class pyskat:
         for card in self.tisch.skat:
             print card
         print 70 * '-'
+
+    def _nextRound(self, widget, event, data):
+        self.nextRound()
+        return True
 
     def nextRound(self):
         self.round += 1
@@ -539,8 +564,7 @@ def main():
 
     skat.listPlayers()
 
-    for i in range(10):
-        skat.nextRound()
+    gtk.main()
 
 if __name__ == '__main__':
     main()
