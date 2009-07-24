@@ -306,6 +306,9 @@ class Tisch:
         self.win = win
 
     def click_card(self, widget, event, data):
+        # TODO: nur zulaessige karten spielen
+        #       keine karten spielen, wenn nicht dran
+
         print "*** %s clicked ***" % data
         self.playCard(data)
         # benachrichtigen des naechsten spielers
@@ -334,12 +337,14 @@ class Tisch:
     def showPlayerCards(self, player):
         for card in player.cards:
             if player.human:
+                self.win.fix.destroy()
+                self.win.fix = gtk.Fixed()
                 offset = 0
                 for card in player.cards:
                     self.win.fix.put(self.card_button(card.rank+card.suit,
                         self.click_card, card), offset, 450)
                     offset += 80
-                self.win.fix.reparent(self.win)
+                self.win.add(self.win.fix)
                 self.win.show_all()
 
     def playCard(self, card):
