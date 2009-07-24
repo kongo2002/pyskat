@@ -237,6 +237,10 @@ class Player:
     def playStich(self, tisch):
         card = None
 
+        if self.human:
+            tisch.showPlayerCards(self)
+            return
+
         # player = vorhand
         if len(tisch.stich) == 0:
             print self.cards
@@ -286,10 +290,11 @@ class Player:
             tisch.players[(self.position+1)%3].playStich(tisch)
         else:
             tisch.vorhand = tisch.calculatePoints()
+            tisch.nextStich()
 
 class Tisch:
     
-    def __init__(self):
+    def __init__(self, win):
         self.players = []
         self.playedStiche = []
         self.stich = []
@@ -298,6 +303,44 @@ class Tisch:
         self.vorhand = 0
         self.handspiel = False
         self.spielmacher = None
+        self.win = win
+
+    def click_card(self, widget, event, data):
+        print "*** %s clicked ***" % data
+        self.playCard(data)
+        # benachrichtigen des naechsten spielers
+        # oder naechster stich
+        if len(self.stich) > 0:
+            self.players[(data.owner.position+1)%3].playStich(self)
+        else:
+            self.vorhand = self.calculatePoints()
+            self.nextStich()
+
+    def card_button(self, id, callb, data):
+        image = gtk.Image()
+        eb = gtk.EventBox()
+        file = "cards/%d.gif" % id
+        try:
+            image.set_from_pixbuf(gtk.gdk.pixbuf_new_from_file(file))
+        except Exception, e:
+            print e.message
+            sys.exit(1)
+        eb.set_events(gtk.gdk.BUTTON_PRESS_MASK)
+        eb.set_visible_window(False)
+        eb.connect('button_press_event', callb, data)
+        eb.add(image)
+        return eb
+
+    def showPlayerCards(self, player):
+        for card in player.cards:
+            if player.human:
+                offset = 0
+                for card in player.cards:
+                    self.win.fix.put(self.card_button(card.rank+card.suit,
+                        self.click_card, card), offset, 450)
+                    offset += 80
+                self.win.fix.reparent(self.win)
+                self.win.show_all()
 
     def playCard(self, card):
         print "%s: %s" % (card.owner.name, card)
@@ -358,20 +401,19 @@ class Tisch:
         return True
 
     def nextStich(self):
-        print "*** Stich %d ***" % (len(self.playedStiche)+1)
-        print "*** Spiel: %s ***" % SUITS[self.trumpf]
+        if len(self.playedStiche) < 10:
+            print "*** Stich %d ***" % (len(self.playedStiche)+1)
+            print "*** Spiel: %s ***" % SUITS[self.trumpf]
 
-        # nur die vorhand wird aufgerufen
-        # die anderen spieler rufen sich selber auf
-        # playCard() wird auch von den spielern selber aufgerufen...
-        self.players[self.vorhand].playStich(self)
+            # nur die vorhand wird aufgerufen
+            # die anderen spieler rufen sich selber auf
+            # playCard() wird auch von den spielern selber aufgerufen...
+            self.players[self.vorhand].playStich(self)
 
-#        self.playCard(self.players[self.vorhand].playStich(self))
-#        self.playCard(self.players[(self.vorhand+1)%3].playStich(self))
-#        self.playCard(self.players[(self.vorhand+2)%3].playStich(self))
-
-        # wird vom letzten spieler aufgerufen
-        #self.vorhand = self.calculatePoints()
+            # wird vom letzten spieler aufgerufen
+            #self.vorhand = self.calculatePoints()
+        else:
+            self.win.roundSummary(self.spielmacher)
 
     def calculatePoints(self):
         winner = None
@@ -422,27 +464,9 @@ class pyskat(gtk.Window):
         self.show_all()
 
         self.deck = Deck()
-        self.tisch = Tisch()
+        self.tisch = Tisch(self)
         self.vorhand = 0
         self.round = 0
-
-    def card_button(self, id, callb, data):
-        image = gtk.Image()
-        eb = gtk.EventBox()
-        file = "cards/%d.gif" % id
-        try:
-            image.set_from_pixbuf(gtk.gdk.pixbuf_new_from_file(file))
-        except Exception, e:
-            print e.message
-            sys.exit(1)
-        eb.set_events(gtk.gdk.BUTTON_PRESS_MASK)
-        eb.set_visible_window(False)
-        eb.connect('button_press_event', callb, data)
-        eb.add(image)
-        return eb
-
-    def click_card(self, widget, event, data):
-        print "*** %s clicked ***" % data
 
     def addPlayer(self, name):
         if len(self.tisch.players) < 3:
@@ -461,16 +485,6 @@ class pyskat(gtk.Window):
             print player
             player.printCards()
             print 70 * '-'
-
-            # card buttons
-            if player.human:
-                offset = 0
-                for card in player.cards:
-                    self.fix.put(self.card_button(card.rank+card.suit,
-                        self.click_card, card), offset, 450)
-                    offset += 80
-                self.fix.reparent(self)
-                self.show_all()
 
     def showSkat(self):
         print "Karten im Skat:"
@@ -513,18 +527,15 @@ class pyskat(gtk.Window):
 
         self.showSkat()
 
-        for i in range(10):
-            self.tisch.nextStich()
+        self.tisch.nextStich()
 
-        self.roundSummary(self.tisch.spielmacher)
-
-        self.vorhand = (self.vorhand + 1) % 3
-        
         widget.show()
 
         return True
 
     def roundSummary(self, player):
+        self.vorhand = (self.vorhand + 1) % 3
+
         re_pts = player.points
         for card in self.tisch.skat:
             re_pts += card.point
