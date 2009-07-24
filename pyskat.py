@@ -402,7 +402,7 @@ class pyskat(gtk.Window):
         self.startb = gtk.Button('Naechste Runde')
         self.startb.set_size_request(150, 30)
         self.fix.put(self.startb, 325, 275)
-        self.startb.connect('button_press_event', self._nextRound, None)
+        self.startb.connect('button_press_event', self.nextRound, None)
         self.add(self.fix)
         self.connect('destroy', gtk.main_quit)
         self.show_all()
@@ -411,6 +411,24 @@ class pyskat(gtk.Window):
         self.tisch = Tisch()
         self.vorhand = 0
         self.round = 0
+
+    def card_button(self, id, callb, data):
+        image = gtk.Image()
+        eb = gtk.EventBox()
+        file = "cards/%d.gif" % id
+        try:
+            image.set_from_pixbuf(gtk.gdk.pixbuf_new_from_file(file))
+        except Exception, e:
+            print e.message
+            sys.exit(1)
+        eb.set_events(gtk.gdk.BUTTON_PRESS_MASK)
+        eb.set_visible_window(False)
+        eb.connect('button_press_event', callb, data)
+        eb.add(image)
+        return eb
+
+    def click_card(self, widget, event, data):
+        print "*** %s clicked ***" % data
 
     def addPlayer(self, name):
         if len(self.tisch.players) < 3:
@@ -430,17 +448,25 @@ class pyskat(gtk.Window):
             player.printCards()
             print 70 * '-'
 
+            # card buttons
+            if player.human:
+                offset = 0
+                for card in player.cards:
+                    self.fix.put(self.card_button(card.rank+card.suit,
+                        self.click_card, card), offset, 450)
+                    offset += 80
+                self.fix.reparent(self)
+                self.show_all()
+
     def showSkat(self):
         print "Karten im Skat:"
         for card in self.tisch.skat:
             print card
         print 70 * '-'
 
-    def _nextRound(self, widget, event, data):
-        self.nextRound()
-        return True
+    def nextRound(self, widget, event, data):
+        widget.hide()
 
-    def nextRound(self):
         self.round += 1
 
         self.deck.shuffle()
@@ -468,7 +494,8 @@ class pyskat(gtk.Window):
                 del player.cards[:]
 
             self.vorhand = (self.vorhand + 1) % 3
-            return self.nextRound()
+            widget.show()
+            return True
 
         self.showSkat()
 
@@ -478,6 +505,10 @@ class pyskat(gtk.Window):
         self.roundSummary(self.tisch.spielmacher)
 
         self.vorhand = (self.vorhand + 1) % 3
+        
+        widget.show()
+
+        return True
 
     def roundSummary(self, player):
         re_pts = player.points
