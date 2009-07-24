@@ -235,12 +235,14 @@ class Player:
         return self.getBestSuit()
 
     def playStich(self, tisch):
+        card = None
+
         # player = vorhand
         if len(tisch.stich) == 0:
             print self.cards
 
             # TODO: intelligente kartenauswahl
-            return tactics.aufspielen(self, tisch)
+            card = tactics.aufspielen(self, tisch)
 
         # player = mittelhand oder hinterhand
         else:
@@ -265,16 +267,25 @@ class Player:
                 print self.cards
 
                 # TODO: intelligente kartenauswahl
-                return tactics.stechenSchmieren(self, tisch)
+                card = tactics.stechenSchmieren(self, tisch)
             # bedienen
             else:
                 print possible_cards
 
                 if len(possible_cards) == 1:
-                    return possible_cards[0]
+                    card = possible_cards[0]
                 else:
                     # TODO: intelligente kartenauswahl
-                    return tactics.bedienen(self, tisch, possible_cards)
+                    card = tactics.bedienen(self, tisch, possible_cards)
+
+        tisch.playCard(card)
+        
+        # benachrichtigen des naechsten spielers
+        # oder naechster stich
+        if len(tisch.stich) > 0:
+            tisch.players[(self.position+1)%3].playStich(tisch)
+        else:
+            tisch.vorhand = tisch.calculatePoints()
 
 class Tisch:
     
@@ -350,20 +361,23 @@ class Tisch:
         print "*** Stich %d ***" % (len(self.playedStiche)+1)
         print "*** Spiel: %s ***" % SUITS[self.trumpf]
 
-        self.playCard(self.players[self.vorhand].playStich(self))
-        self.playCard(self.players[(self.vorhand+1)%3].playStich(self))
-        self.playCard(self.players[(self.vorhand+2)%3].playStich(self))
+        # nur die vorhand wird aufgerufen
+        # die anderen spieler rufen sich selber auf
+        # playCard() wird auch von den spielern selber aufgerufen...
+        self.players[self.vorhand].playStich(self)
 
-        self.vorhand = self.calculatePoints()
+#        self.playCard(self.players[self.vorhand].playStich(self))
+#        self.playCard(self.players[(self.vorhand+1)%3].playStich(self))
+#        self.playCard(self.players[(self.vorhand+2)%3].playStich(self))
+
+        # wird vom letzten spieler aufgerufen
+        #self.vorhand = self.calculatePoints()
 
     def calculatePoints(self):
         winner = None
         points = 0
 
         lastStich = self.playedStiche[len(self.playedStiche)-1]
-
-        # TODO: correct calculation of winner
-        #       implementation of 'trumpf'
 
         if lastStich[0].isGreater(lastStich[1], self.trumpf):
             if lastStich[0].isGreater(lastStich[2], self.trumpf):
