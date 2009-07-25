@@ -307,16 +307,48 @@ class Tisch:
         self.win = win
 
     def click_card(self, widget, event, data):
-        # TODO: nur zulaessige karten spielen
-        #       keine karten spielen, wenn nicht dran
+        if data:
+            spieler = data.owner
+        else:
+            return True
+
+        if not spieler.human or self.state != S_SPIELEN:
+            return True
+
+        # muss bedient werden?
+        if len(self.stich) > 0:
+            possible = []
+
+            # trumpf gespielt
+            if self.stich[0].suit == self.trumpf or self.stich[0].rank == BUBE:
+                for j in spieler.cards:
+                    if j.suit == self.trumpf or j.rank == BUBE:
+                        possible.append(j)
+
+            # fehl gespielt
+            else:
+                for j in spieler.cards:
+                    if self.stich[0].suit == j.suit and j.rank != BUBE:
+                        possible.append(j)
+
+            if len(possible) > 0:
+                correct = False
+                for card in possible:
+                    if card == data:
+                        correct = True
+                        break
+                if not correct:
+                    print "*** Bedienzwang ***"
+                    return True
 
         print "*** %s clicked ***" % data
         self.playCard(data)
-        self.showPlayerCards(data.owner)
+        self.showPlayerCards(spieler)
+
         # benachrichtigen des naechsten spielers
         # oder naechster stich
         if len(self.stich) > 0:
-            self.players[(data.owner.position+1)%3].playStich(self)
+            self.players[(spieler.position+1)%3].playStich(self)
         else:
             self.vorhand = self.calculatePoints()
             self.nextStich()
