@@ -122,7 +122,7 @@ class Card:
             if self.rank == BUBE:
                 if other.rank != BUBE:
                     return True
-                else if self.suit > other.suit:
+                elif self.suit > other.suit:
                     return True
                 else:
                     return False

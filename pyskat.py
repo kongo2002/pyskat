@@ -5,7 +5,9 @@ from pyskatrc import *
 import tactics
 import random
 import gtk
+import cairo
 import sys
+import time
 
 class Deck:
 
@@ -284,6 +286,9 @@ class Player:
 
         tisch.playCard(card)
 
+        # wait a moment
+        time.sleep(1)
+
         # benachrichtigen des naechsten spielers
         # oder naechster stich
         if len(tisch.stich) > 0:
@@ -305,6 +310,16 @@ class Tisch:
         self.spielmacher = None
         self.state = S_WARTEN
         self.win = win
+        self.win.connect('expose_event', self.expose)
+
+        self.cardgfx = {}
+        for i in [x+y for x in [1,13,12,11,10,9,8,7] for y in [40,60,80,100]]:
+            try:
+                file = "cards/%d.png" % i
+                self.cardgfx[i] = cairo.ImageSurface.create_from_png(file)
+            except Exception, e:
+                print e.message
+                sys.exit(1)
 
     def click_card(self, widget, event, data):
         if data:
@@ -353,6 +368,21 @@ class Tisch:
             self.vorhand = self.calculatePoints()
             self.nextStich()
 
+    def expose(self, widget, event):
+        # display card on playground
+        # try to use cairo here because otherwise
+        # the fixed widget has to be completely repositioned
+        self.cr = self.win.window.cairo_create()
+        self.cr.set_source_rgb(1, 1, 1)
+        self.cr.paint()
+
+        if self.state == S_SPIELEN:
+            for card in self.stich:
+                index = card.rank + card.suit
+                self.cr.set_source_surface(self.cardgfx[index],
+                        250+70*card.owner.position, 200)
+                self.cr.paint()
+
     def card_button(self, id, callb, data):
         image = gtk.Image()
         eb = gtk.EventBox()
@@ -383,6 +413,8 @@ class Tisch:
     def playCard(self, card):
         print "%s: %s" % (card.owner.name, card)
         self.stich.append(card)
+
+        self.expose(None, None)
 
         # remove played card from player
         for i in range(len(self.players)):
@@ -493,7 +525,8 @@ class pyskat(gtk.Window):
 
         self.set_title('pyskat')
         self.set_size_request(800, 600)
-        self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(6400, 6400, 6440))
+        #self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(6400, 6400, 6440))
+        self.set_app_paintable(1)
         self.set_position(gtk.WIN_POS_CENTER)
 
         self.fix = gtk.Fixed()
