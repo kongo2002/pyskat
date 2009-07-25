@@ -182,7 +182,7 @@ def aufspielen(spieler, tisch):
         print "%s (Kontra) kommt raus" % spieler.name
 
     # ass spielen, wenn kein trumpf
-    # TODO: nur spielen, wenn moeglich dass durchgeht 
+    # TODO: nur spielen, wenn moeglich dass durchgeht
     #       oder keine truempfe mehr drin
     ace = None
     for card in spieler.cards:
@@ -365,7 +365,7 @@ def bedienen(spieler, tisch, possible):
                     return biggest(possible)
 
 def stechenSchmieren(spieler, tisch):
-    # eigene karten 
+    # eigene karten
     own = {}
     own = splitCards(spieler.cards, tisch.trumpf)
 

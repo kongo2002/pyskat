@@ -102,12 +102,42 @@ class Card:
         self.owner = player
 
     def isGreater(self, other, trumpf, null=False):
+        # NULLSPIEL (RAMSCH)
         if null:
-            # TODO: nullspiel (bzw. ramsch)
-            pass
+            # nicht bedient
+            if other.suit != self.suit:
+                return True
+            # ass
+            elif self.rank == ASS and other.rank != ASS:
+                return True
+            elif other.rank == ASS and self.rank != ASS:
+                return False
+            elif self.rank > other.rank:
+                return True
+            else:
+                return False
+        # GRANDSPIEL
         elif not trumpf:
-            # TODO: grandspiel
-            pass
+            # bube
+            if self.rank == BUBE:
+                if other.rank != BUBE:
+                    return True
+                else if self.suit > other.suit:
+                    return True
+                else:
+                    return False
+            # kein bube
+            else:
+                if other.rank == BUBE:
+                    return False
+                # nicht bedient
+                elif other.suit != self.suit:
+                    return True
+                elif self > other:
+                    return True
+                else:
+                    return False
+        # NORMALSPIEL
         else:
             # trumpf ueber fehl
             if ((self.suit == trumpf or self.rank == BUBE) and
