@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last Change: Jul 20, 2009
+# Last Change: Jul 25, 2009
 
 from pyskatrc import *
 import tactics
@@ -108,7 +108,7 @@ class Player:
         return color
 
     def reizen(self):
-        max = REIZEN[self.getBestSuit()]*self.getMaxReizwert() 
+        max = REIZEN[self.getBestSuit()]*self.getMaxReizwert()
         rating = tactics.rateCards(self)
 
         print "%s: kann bis %d reizen (Rating=%d)" % (self.name, max, rating)
@@ -283,7 +283,7 @@ class Player:
                     card = tactics.bedienen(self, tisch, possible_cards)
 
         tisch.playCard(card)
-        
+
         # benachrichtigen des naechsten spielers
         # oder naechster stich
         if len(tisch.stich) > 0:
@@ -293,7 +293,7 @@ class Player:
             tisch.nextStich()
 
 class Tisch:
-    
+
     def __init__(self, win):
         self.players = []
         self.playedStiche = []
@@ -303,6 +303,7 @@ class Tisch:
         self.vorhand = 0
         self.handspiel = False
         self.spielmacher = None
+        self.state = S_WARTEN
         self.win = win
 
     def click_card(self, widget, event, data):
@@ -385,6 +386,8 @@ class Tisch:
             print "Error: 3 Spieler noetig"
 
     def reizen(self, vorhand):
+        self.state = S_REIZEN
+
         self.spielmacher = self.players[(vorhand+1)%3].doSagen(self.players[vorhand])
         self.spielmacher = self.spielmacher.doSagen(self.players[(vorhand+2)%3])
 
@@ -397,6 +400,8 @@ class Tisch:
 
         print "%s gewinnt das Reizen mit %d Punkten" % (self.spielmacher.name,
                 self.spielmacher.gereizt)
+
+        self.state = S_SKAT
 
         self.handspiel = self.spielmacher.takeSkat(self.skat)
         self.spielmacher.re = True
@@ -439,7 +444,7 @@ class Tisch:
 
         for card in lastStich:
             points += card.point
-        
+
         winner.points += points
 
         print "%s bekommt den Stich (%d)" % (winner, points)
@@ -510,7 +515,7 @@ class pyskat(gtk.Window):
 
         for player in self.tisch.players:
             player.reizen()
-    
+
         print "Vorhand:    %s" % self.tisch.players[self.vorhand]
         print "Mittelhand: %s" % self.tisch.players[(self.vorhand+1)%3]
         print "Hinterhand: %s" % self.tisch.players[(self.vorhand+2)%3]
@@ -530,6 +535,8 @@ class pyskat(gtk.Window):
             widget.show()
             return True
 
+        self.tisch.state = S_SPIELEN
+
         self.showSkat()
 
         self.tisch.nextStich()
@@ -539,6 +546,8 @@ class pyskat(gtk.Window):
         return True
 
     def roundSummary(self, player):
+        self.tisch.state = S_WARTEN
+
         self.vorhand = (self.vorhand + 1) % 3
 
         re_pts = player.points

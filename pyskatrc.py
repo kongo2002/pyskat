@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last Change: Jul 19, 2009
+# Last Change: Jul 25, 2009
 
 KARO = 40
 HERZ = 60
@@ -38,6 +38,11 @@ REIZEN = {  PIK:    11,
             KREUZ:  12,
             KARO:   9,
             HERZ:   10 }
+
+S_REIZEN = 1
+S_SKAT = 2
+S_SPIELEN = 3
+S_WARTEN = 4
 
 class Card:
 
