@@ -312,6 +312,7 @@ class Tisch:
 
         print "*** %s clicked ***" % data
         self.playCard(data)
+        self.showPlayerCards(data.owner)
         # benachrichtigen des naechsten spielers
         # oder naechster stich
         if len(self.stich) > 0:
@@ -336,17 +337,16 @@ class Tisch:
         return eb
 
     def showPlayerCards(self, player):
-        for card in player.cards:
-            if player.human:
-                self.win.fix.destroy()
-                self.win.fix = gtk.Fixed()
-                offset = 0
-                for card in player.cards:
-                    self.win.fix.put(self.card_button(card.rank+card.suit,
-                        self.click_card, card), offset, 450)
-                    offset += 80
-                self.win.add(self.win.fix)
-                self.win.show_all()
+        if player.human:
+            self.win.fix.destroy()
+            self.win.fix = gtk.Fixed()
+            offset = 0
+            for card in player.cards:
+                self.win.fix.put(self.card_button(card.rank+card.suit,
+                    self.click_card, card), offset, 450)
+                offset += 80
+            self.win.add(self.win.fix)
+            self.win.show_all()
 
     def playCard(self, card):
         print "%s: %s" % (card.owner.name, card)
@@ -503,8 +503,6 @@ class pyskat(gtk.Window):
         print 70 * '-'
 
     def nextRound(self, widget, event, data):
-        widget.hide()
-
         self.round += 1
 
         self.deck.shuffle()
@@ -540,8 +538,6 @@ class pyskat(gtk.Window):
         self.showSkat()
 
         self.tisch.nextStich()
-
-        widget.show()
 
         return True
 
@@ -623,7 +619,20 @@ class pyskat(gtk.Window):
             spieler.gereizt = 0
             spieler.points = 0
 
+            if spieler.human:
+                self.tisch.showPlayerCards(spieler)
+
         self.listPlayers()
+
+        self.fix.destroy()
+        self.fix = gtk.Fixed()
+        self.startb.destroy()
+        self.startb = gtk.Button('Naechste Runde')
+        self.startb.set_size_request(150, 30)
+        self.fix.put(self.startb, 325, 275)
+        self.startb.connect('button_press_event', self.nextRound, None)
+        self.add(self.fix)
+        self.show_all()
 
 def main():
 
