@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last Change: Jul 25, 2009
+# Last Change: Jul 26, 2009
 
 from pyskatrc import *
 import tactics
@@ -369,18 +369,25 @@ class Tisch:
             self.nextStich()
 
     def expose(self, widget, event):
-        # display card on playground
-        # try to use cairo here because otherwise
-        # the fixed widget has to be completely repositioned
         self.cr = self.win.window.cairo_create()
-        self.cr.set_source_rgb(1, 1, 1)
-        self.cr.paint()
+        
+        width, height = self.win.get_size()
+
+        offset_w = width / 2 - 120
+        offset_h = height / 2 - 210
 
         if self.state == S_SPIELEN:
             for card in self.stich:
                 index = card.rank + card.suit
-                self.cr.set_source_surface(self.cardgfx[index],
-                        250+70*card.owner.position, 200)
+                if card.owner.position == 0:
+                    self.cr.set_source_surface(self.cardgfx[index],
+                            offset_w+35, offset_h+50)
+                elif card.owner.position == 1:
+                    self.cr.set_source_surface(self.cardgfx[index],
+                            offset_w, offset_h)
+                else:
+                    self.cr.set_source_surface(self.cardgfx[index],
+                            offset_w+70, offset_h-50)
                 self.cr.paint()
 
     def card_button(self, id, callb, data):
@@ -400,14 +407,14 @@ class Tisch:
 
     def showPlayerCards(self, player):
         if player.human:
-            self.win.fix.destroy()
-            self.win.fix = gtk.Fixed()
+            self.win.tab.destroy()
+            self.win.tab = gtk.Table(3, 10, True)
             offset = 0
             for card in player.cards:
-                self.win.fix.put(self.card_button(card.rank+card.suit,
-                    self.click_card, card), offset, 450)
-                offset += 80
-            self.win.add(self.win.fix)
+                self.win.tab.attach(self.card_button(card.rank+card.suit,
+                    self.click_card, card), offset, offset+1, 2, 3)
+                offset += 1
+            self.win.add(self.win.tab)
             self.win.show_all()
 
     def playCard(self, card):
@@ -529,12 +536,12 @@ class pyskat(gtk.Window):
         self.set_app_paintable(1)
         self.set_position(gtk.WIN_POS_CENTER)
 
-        self.fix = gtk.Fixed()
+        self.tab = gtk.Table(3, 10, True)
         self.startb = gtk.Button('Naechste Runde')
         self.startb.set_size_request(150, 30)
-        self.fix.put(self.startb, 325, 275)
+        self.tab.attach(self.startb, 4, 5, 1, 2, gtk.FILL, gtk.FILL)
         self.startb.connect('button_press_event', self.nextRound, None)
-        self.add(self.fix)
+        self.add(self.tab)
         self.connect('destroy', gtk.main_quit)
         self.show_all()
 
@@ -689,14 +696,13 @@ class pyskat(gtk.Window):
 
         self.listPlayers()
 
-        self.fix.destroy()
-        self.fix = gtk.Fixed()
-        self.startb.destroy()
+        self.tab.destroy()
+        self.tab = gtk.Table(3, 10, True)
         self.startb = gtk.Button('Naechste Runde')
         self.startb.set_size_request(150, 30)
-        self.fix.put(self.startb, 325, 275)
+        self.tab.attach(self.startb, 4, 5, 1, 2, gtk.FILL, gtk.FILL)
         self.startb.connect('button_press_event', self.nextRound, None)
-        self.add(self.fix)
+        self.add(self.tab)
         self.show_all()
 
 def main():
