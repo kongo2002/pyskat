@@ -310,7 +310,7 @@ class Tisch:
         self.spielmacher = None
         self.state = S_WARTEN
         self.win = win
-        self.win.connect('expose_event', self.expose)
+        self.win.da.connect('expose_event', self.expose)
 
         self.cardgfx = {}
         for i in [x+y for x in [1,13,12,11,10,9,8,7] for y in [40,60,80,100]]:
@@ -369,9 +369,17 @@ class Tisch:
             self.nextStich()
 
     def expose(self, widget, event):
-        self.cr = self.win.window.cairo_create()
+        self.cr = widget.window.cairo_create()
 
         width, height = self.win.get_size()
+
+        print "%s x %s" % (width, height)
+
+        for child in self.win.v.get_children():
+            print self.win.v.query_child_packing(child)
+            print child.get_size_request()
+
+        self.win.v.resize_children()
 
         offset_w = width / 2 - 120
         offset_h = height / 2 - 210
@@ -420,15 +428,16 @@ class Tisch:
     def showPlayerCards(self, player):
         if player.human:
             self.win.tab.destroy()
-            self.win.tab = gtk.Table(3, 10, True)
+            self.win.tab = gtk.Table(1, 10, True)
             offset = 0
             for card in player.cards:
                 self.win.tab.attach(self.card_button(card.rank+card.suit,
                     self.click_card, card), offset, offset+1, 2, 3)
                 offset += 1
-            self.win.add(self.win.tab)
+            #self.win.tab.set_size_request(140, 140)
+            self.win.v.pack_start(self.win.tab, False, False, 0)
             self.win.show_all()
-            self.expose(None, None)
+            self.expose(self.win.da, None)
 
     def playCard(self, card):
         print "%s: %s" % (card.owner.name, card)
@@ -441,7 +450,7 @@ class Tisch:
                     del self.players[i].cards[j]
                     break
 
-        self.expose(None, None)
+        self.expose(self.win.da, None)
 
         if len(self.stich) == 3:
             lastStich = self.stich[:]
@@ -549,12 +558,21 @@ class pyskat(gtk.Window):
         self.set_app_paintable(1)
         self.set_position(gtk.WIN_POS_CENTER)
 
-        self.tab = gtk.Table(3, 10, True)
+        self.v = gtk.VBox()
+
+        self.da = gtk.DrawingArea()
+        self.v.pack_start(self.da, True, True, 0)
+
+        self.tab = gtk.Table(1, 10, True)
+        #self.tab.set_size_request(140, 140)
+        self.v.pack_start(self.tab, False, False, 0)
+
         self.startb = gtk.Button('Naechste Runde')
-        self.startb.set_size_request(150, 30)
-        self.tab.attach(self.startb, 4, 5, 1, 2, gtk.FILL, gtk.FILL)
+        #self.startb.set_size_request(150, 30)
         self.startb.connect('button_press_event', self.nextRound, None)
-        self.add(self.tab)
+        self.v.pack_start(self.startb, False, False, 0)
+
+        self.add(self.v)
         self.connect('destroy', gtk.main_quit)
         self.show_all()
 
@@ -588,6 +606,10 @@ class pyskat(gtk.Window):
         print 70 * '-'
 
     def nextRound(self, widget, event, data):
+        self.v.remove(widget)
+        self.v.resize_children()
+        widget.destroy()
+
         self.round += 1
 
         self.deck.shuffle()
@@ -710,12 +732,12 @@ class pyskat(gtk.Window):
         self.listPlayers()
 
         self.tab.destroy()
-        self.tab = gtk.Table(3, 10, True)
+        #self.tab = gtk.Table(1, 10, True)
         self.startb = gtk.Button('Naechste Runde')
-        self.startb.set_size_request(150, 30)
-        self.tab.attach(self.startb, 4, 5, 1, 2, gtk.FILL, gtk.FILL)
+        #self.startb.set_size_request(150, 30)
+        #self.tab.attach(self.startb, 4, 5, 1, 2, gtk.FILL, gtk.FILL)
         self.startb.connect('button_press_event', self.nextRound, None)
-        self.add(self.tab)
+        self.v.pack_start(self.startb, False, False, 0)
         self.show_all()
 
 def main():
