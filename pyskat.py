@@ -370,7 +370,7 @@ class Tisch:
 
     def expose(self, widget, event):
         self.cr = self.win.window.cairo_create()
-        
+
         width, height = self.win.get_size()
 
         offset_w = width / 2 - 120
@@ -428,12 +428,11 @@ class Tisch:
                 offset += 1
             self.win.add(self.win.tab)
             self.win.show_all()
+            self.expose(None, None)
 
     def playCard(self, card):
         print "%s: %s" % (card.owner.name, card)
         self.stich.append(card)
-
-        self.expose(None, None)
 
         # remove played card from player
         for i in range(len(self.players)):
@@ -441,6 +440,8 @@ class Tisch:
                 if self.players[i].cards[j] == card:
                     del self.players[i].cards[j]
                     break
+
+        self.expose(None, None)
 
         if len(self.stich) == 3:
             lastStich = self.stich[:]
