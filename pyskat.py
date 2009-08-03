@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last Change: Jul 26, 2009
+# Last Change: Aug 03, 2009
 
 from pyskatrc import *
 import tactics
@@ -376,7 +376,19 @@ class Tisch:
         offset_w = width / 2 - 120
         offset_h = height / 2 - 210
 
+        pname = lambda x: self.players[x].re and "%s %s" % (self.players[x].name, "(Re)") or self.players[x].name
+
         if self.state == S_SPIELEN:
+            self.cr.move_to(width/2, height - 200)
+            self.cr.show_text(pname(0))
+            self.cr.move_to(50, 50)
+            self.cr.show_text(pname(1))
+            self.cr.move_to(width - 100, 50)
+            self.cr.show_text(pname(2))
+
+            self.cr.move_to(width/2, 10)
+            self.cr.show_text("Spiel: %s" % SUITS[self.trumpf])
+
             for card in self.stich:
                 index = card.rank + card.suit
                 if card.owner.position == 0:
