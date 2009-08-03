@@ -372,22 +372,19 @@ class Tisch:
         self.cr = widget.window.cairo_create()
 
         width, height = self.win.get_size()
-
-        print "%s x %s" % (width, height)
-
-        for child in self.win.v.get_children():
-            print self.win.v.query_child_packing(child)
-            print child.get_size_request()
-
-        self.win.v.resize_children()
+        height -= 140
 
         offset_w = width / 2 - 120
-        offset_h = height / 2 - 210
+        offset_h = height / 2 - 95
+
+        self.cr.set_source_rgb(1, 1, 1)
+        self.cr.paint()
+        self.cr.set_source_rgb(0, 0, 0)
 
         pname = lambda x: self.players[x].re and "%s %s" % (self.players[x].name, "(Re)") or self.players[x].name
 
         if self.state == S_SPIELEN:
-            self.cr.move_to(width/2, height - 200)
+            self.cr.move_to(width/2, height - 20)
             self.cr.show_text(pname(0))
             self.cr.move_to(50, 50)
             self.cr.show_text(pname(1))
@@ -432,9 +429,8 @@ class Tisch:
             offset = 0
             for card in player.cards:
                 self.win.tab.attach(self.card_button(card.rank+card.suit,
-                    self.click_card, card), offset, offset+1, 2, 3)
+                    self.click_card, card), offset, offset+1, 0, 1)
                 offset += 1
-            #self.win.tab.set_size_request(140, 140)
             self.win.v.pack_start(self.win.tab, False, False, 0)
             self.win.show_all()
             self.expose(self.win.da, None)
@@ -564,11 +560,9 @@ class pyskat(gtk.Window):
         self.v.pack_start(self.da, True, True, 0)
 
         self.tab = gtk.Table(1, 10, True)
-        #self.tab.set_size_request(140, 140)
         self.v.pack_start(self.tab, False, False, 0)
 
         self.startb = gtk.Button('Naechste Runde')
-        #self.startb.set_size_request(150, 30)
         self.startb.connect('button_press_event', self.nextRound, None)
         self.v.pack_start(self.startb, False, False, 0)
 
@@ -731,11 +725,7 @@ class pyskat(gtk.Window):
 
         self.listPlayers()
 
-        self.tab.destroy()
-        #self.tab = gtk.Table(1, 10, True)
         self.startb = gtk.Button('Naechste Runde')
-        #self.startb.set_size_request(150, 30)
-        #self.tab.attach(self.startb, 4, 5, 1, 2, gtk.FILL, gtk.FILL)
         self.startb.connect('button_press_event', self.nextRound, None)
         self.v.pack_start(self.startb, False, False, 0)
         self.show_all()
