@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last Change: Aug 03, 2009
+# Last Change: Aug 05, 2009
 
 from pyskatrc import *
 import tactics
@@ -422,8 +422,15 @@ class Tisch:
         eb.add(image)
         return eb
 
+    def sortHand(self, player):
+        for i, card in enumerate(player.cards):
+            if len(player.cards) > i+1:
+                if not card.isGreater(player.cards[i+1], self.trumpf):
+                    player.cards[i], player.cards[i+1] = player.cards[i+1], player.cards[i]
+
     def showPlayerCards(self, player):
         if player.human:
+            self.sortHand(player)
             self.win.tab.destroy()
             self.win.tab = gtk.Table(1, 10, True)
             offset = 0
