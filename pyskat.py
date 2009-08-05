@@ -423,10 +423,16 @@ class Tisch:
         return eb
 
     def sortHand(self, player):
-        for i, card in enumerate(player.cards):
-            if len(player.cards) > i+1:
-                if not card.isGreater(player.cards[i+1], self.trumpf):
-                    player.cards[i], player.cards[i+1] = player.cards[i+1], player.cards[i]
+        # dirty sorting routine
+        # TODO: better sorting algorithm
+        for y in range(len(player.cards)):
+            for z in range(len(player.cards)):
+                i = z
+                for k in range(z+1, len(player.cards)):
+                    if player.cards[k].isGreater(player.cards[i], self.trumpf):
+                        i = k
+                if z != i:
+                    player.cards[i], player.cards[z] = player.cards[z], player.cards[i]
 
     def showPlayerCards(self, player):
         if player.human:
