@@ -685,44 +685,44 @@ class pyskat(gtk.Window):
         print "Runde %d - Spiel: %s" % (self.round, SUITS[self.tisch.trumpf])
         print "%s gereizt bis %d" % (player.name, player.gereizt)
 
-        # nicht ueberreizt
-        if player.gereizt <= spielwert:
-            # spiel gewonnen
-            if re_pts > 60:
-                print "%s gewinnt mit %d zu %d Punkten" % (player.name,
-                        re_pts,
-                        kontra_pts)
+        # spiel gewonnen
+        if re_pts > 60:
+            print "%s gewinnt mit %d zu %d Punkten" % (player.name,
+                    re_pts,
+                    kontra_pts)
 
-                # schwarz gewonnen
-                if re_pts == 120:
-                    spielwert += REIZEN[self.tisch.trumpf]*2
-                # schneider gewonnen
-                elif re_pts > 90:
-                    spielwert += REIZEN[self.tisch.trumpf]
+            # schwarz gewonnen
+            if re_pts == 120:
+                spielwert += REIZEN[self.tisch.trumpf]*2
+            # schneider gewonnen
+            elif re_pts > 90:
+                spielwert += REIZEN[self.tisch.trumpf]
 
-                player.gesamt += spielwert
-                print "%s: + %d Punkte" % (player.name, spielwert)
-            # spiel verloren
-            else:
-                print "%s verliert mit %d zu %d Punkten" % (player.name,
-                        re_pts,
-                        kontra_pts)
-
-                # schwarz verloren
-                if re_pts == 0:
-                    spielwert += REIZEN[self.tisch.trumpf]*2
-                # schneider verloren
-                elif re_pts < 30:
-                    spielwert += REIZEN[self.tisch.trumpf]
-
+            # ueberreizt
+            if gereizt > spielwert:
+                print "%s hat %d zu %d Punkte bekommen" % (player.name,
+                        re_pts, kontra_pts)
+                print "Spiel (%d) ueberreizt - verloren!" % spielwert
+                spielwert = player.gereizt * 2
                 player.gesamt -= spielwert
                 print "%s: - %d Punkte" % (player.name, spielwert)
-        # ueberreizt
+            else:
+                player.gesamt += spielwert
+                print "%s: + %d Punkte" % (player.name, spielwert)
+
+        # spiel verloren
         else:
-            print "%s hat %d zu %d Punkte bekommen" % (player.name,
-                    re_pts, kontra_pts)
-            print "Spiel (%d) ueberreizt - verloren!" % spielwert
-            spielwert = player.gereizt * 2
+            print "%s verliert mit %d zu %d Punkten" % (player.name,
+                    re_pts,
+                    kontra_pts)
+
+            # schwarz verloren
+            if re_pts == 0:
+                spielwert += REIZEN[self.tisch.trumpf]*2
+            # schneider verloren
+            elif re_pts < 30:
+                spielwert += REIZEN[self.tisch.trumpf]
+
             player.gesamt -= spielwert
             print "%s: - %d Punkte" % (player.name, spielwert)
 
