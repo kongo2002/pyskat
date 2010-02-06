@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last Change: Aug 05, 2009
+# Last Change:  Sa 06 Feb 2010 18:37:23 CET
 
 from pyskatrc import *
 import tactics
@@ -756,3 +756,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# vim:et sw=4 ts=4 tw=80:

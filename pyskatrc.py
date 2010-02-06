@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last Change: Jul 25, 2009
+# Last Change:  Sa 06 Feb 2010 18:37:29 CET
 
 KARO = 40
 HERZ = 60
@@ -175,3 +175,5 @@ class Card:
                     return False
             else:
                 return False
+
+# vim:et sw=4 ts=4 tw=80:

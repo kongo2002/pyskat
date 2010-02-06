@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last Change: Jul 20, 2009
+# Last Change:  Sa 06 Feb 2010 18:37:36 CET
 
 from pyskatrc import *
 
@@ -544,3 +544,5 @@ def stechenSchmieren(spieler, tisch):
                             if len(own[farbe]) == 1:
                                 wahl = card
                 return wahl
+
+# vim:et sw=4 ts=4 tw=80:
