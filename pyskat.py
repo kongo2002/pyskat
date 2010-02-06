@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Last Change:  Sa 06 Feb 2010 18:37:23 CET
+# Last Change:  Sa 06 Feb 2010 20:23:02 CET
 
 from pyskatrc import *
 import tactics
@@ -432,7 +432,9 @@ class Tisch:
                     if player.cards[k].isGreater(player.cards[i], self.trumpf):
                         i = k
                 if z != i:
-                    player.cards[i], player.cards[z] = player.cards[z], player.cards[i]
+                    # swap
+                    player.cards[i], player.cards[z] = (player.cards[z],
+                            player.cards[i])
 
     def showPlayerCards(self, player):
         if player.human:
@@ -699,7 +701,7 @@ class pyskat(gtk.Window):
                 spielwert += REIZEN[self.tisch.trumpf]
 
             # ueberreizt
-            if gereizt > spielwert:
+            if player.gereizt > spielwert:
                 print "%s hat %d zu %d Punkte bekommen" % (player.name,
                         re_pts, kontra_pts)
                 print "Spiel (%d) ueberreizt - verloren!" % spielwert
@@ -723,6 +725,7 @@ class pyskat(gtk.Window):
             elif re_pts < 30:
                 spielwert += REIZEN[self.tisch.trumpf]
 
+            spielwert *= 2
             player.gesamt -= spielwert
             print "%s: - %d Punkte" % (player.name, spielwert)
 
