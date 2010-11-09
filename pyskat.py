@@ -776,4 +776,4 @@ def main():
 if __name__ == '__main__':
     main()
 
-# vim:et sw=4 ts=4 tw=80:
+# vim:et sw=4 sts=4 tw=80:

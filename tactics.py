@@ -561,4 +561,4 @@ def stechenSchmieren(spieler, tisch):
                                 wahl = card
                 return wahl
 
-# vim:et sw=4 ts=4 tw=80:
+# vim:et sw=4 sts=4 tw=80:
