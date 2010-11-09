@@ -397,7 +397,8 @@ class Tisch:
         self.cr.paint()
         self.cr.set_source_rgb(0, 0, 0)
 
-        pname = lambda x: self.players[x].re and "%s %s" % (self.players[x].name, "(Re)") or self.players[x].name
+        pname = lambda x: self.players[x].re and "%s %s" % (self.players[x].name,
+                "(Re)") or self.players[x].name
 
         if self.state == S_SPIELEN:
             self.cr.move_to(width/2, height - 20)
